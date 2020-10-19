@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+
+
+{% block head %}
+   <title>Random Dice Home</title>
+{% endblock %}
+
+
+
+
+{% block body %}
+
+<h1> page d'accueil </h1>
+
+<h2>veuillez vous logger</h2>
+<br>
+<form action="/login" method="POST">
+    <br>
+    <h3>login</h3>
+    <input type="text" min = "8" name = "login" id="login">
+    <br>
+    <h3>mot de passe</h3>
+    <input type="text" min = "8" name = "mdp" id="mdp">
+    <br>
+    <br>
+    <input type="submit" name = "BpLogin" value="LOGIN">
+
+</form>
+<br>
+<br>
+<br>
+<form action="/nouveauCompte" method="post">
+    <input type="submit" name = "BpNouveauCompte" value="nouveau compte">
+</form>
+
+<br>
+
+
+{% endblock %}
