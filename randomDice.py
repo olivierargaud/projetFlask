@@ -1,9 +1,9 @@
-from flask import Flask,render_template, request, redirect
+from flask import Flask,render_template, request, redirect, session, url_for
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import Table, Column, Integer, ForeignKey
 from sqlalchemy.orm import relationship
 from datetime import datetime
-
+from werkzeug.security import check_password_hash, generate_password_hash
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///baseRandomDice.db'
@@ -66,6 +66,28 @@ def login():
     else:
         return redirect('/')
 
+@app.route('/login',methods=['POST','GET'])
+def validerLogin():
+    # if request.method == 'POST':
+    #     username = request.form['login']
+    #     password = request.form['mdp']
+    #     error = None
+    #     user = db.execute('SELECT * FROM user WHERE login = ?', (username,)).fetchone()
+
+    #     if user is None:
+    #         error = 'Incorrect username.'
+    #     elif not check_password_hash(user['password'], password):
+    #         error = 'Incorrect password.'
+
+    #     if error is None:
+    #         session.clear()
+    #         session['user_id'] = user['id']
+    #         return redirect(url_for('index'))
+
+    #     flash(error)
+
+    return render_template('pagePrincipale.html')
+
 @app.route('/nouveauCompte')
 def nouveauCompteDeBase():
     return render_template('nouveauCompte.html')
@@ -74,5 +96,33 @@ def nouveauCompteDeBase():
 def nouveauCompte():
     if request.method == 'POST':
         return render_template('nouveauCompte.html')  
+    else:
+        return redirect('/')
+
+@app.route('/validerNouveauCompte',methods=['POST','GET'])
+def validerNouveauCompte():
+    if request.method == 'POST':
+
+        print (request.form['login'])
+        print (request.form['mdp'])
+        print (request.form['mdp2'])
+
+        loginSaisie = request.form['login']
+        mdpSaisie = request.form['mdp']
+        confirmationMdpSaisie = request.form['mdp2']
+
+        if mdpSaisie == confirmationMdpSaisie:
+
+            new_user = user(login=loginSaisie,mdp = generate_password_hash(mdpSaisie))
+
+            try:
+                db.session.add(new_user)
+                db.session.commit()
+                return render_template('pagePrincipale.html')
+
+            except:
+                return redirect('/nouveauCompte')
+        else:
+            return redirect('/nouveauCompte')
     else:
         return redirect('/')
