@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+
+
+{% block head %}
+  
+{% endblock %}
+
+
+
+
+{% block body %}
+
+<h1> création dé </h1>
+
+<br>
+<form action="/valideDe" method="POST">
+    
+
+    <input type="text" name = "nomDuDe" value="" minlength="3" required>  nom du dé ( min 3 caractères )
+    <br>
+    <input type="number" name = "nbDeFace" value="" min="2" required>  nb de face ( min 2 )
+    <br>
+    <br>
+    <input type="submit" name = "BpValideDe" value="VALIDER DE">
+
+</form>
+
+<br>
+
+<br>
+<form action="/" method="POST">
+    <input type="submit" name = "BpRetour" value="RETOUR">
+</form>
+
+<br>
+
+{% endblock %}

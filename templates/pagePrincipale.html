@@ -13,6 +13,52 @@
 
 <h1> page principale </h1>
 
+
+
+
+{% if listeDe|length < 1 %}
+    <h4 style = "text-align: center;">pas de Dé créé</h4>
+
+    {% else %}
+
+   <table>
+       <tr>
+           <th>Task</th>
+           <th>Added</th>
+           <th>Actions</th>
+       </tr>
+       {% for dice in listeDe %}
+            <tr>
+                <td>{{ dice.name }}</td>
+                <td>{{ dice.value }}</td>
+                <br>
+                <td>{{ resultat }}</td>
+                <td>
+                    <a href="/delete/{{dice.id}}">Delete</a>
+                    <br>		
+                    <a href="/update/{{dice.id}}">Update</a>
+                    <br>		
+                    <a href="/lancer/{{dice.id}}">lancer</a>
+                </td>
+            </tr>
+        {% endfor %}
+   </table>
+   {% endif %}
+
+
+
+
+
+
+
+
+<br>
+<form action="/creationDe" method="POST">
+    <input type="submit" name = "BpCreationDe" value="CREER NOUVEAU DE">
+</form>
+
+<br>
+
 <br>
 <form action="/" method="POST">
     <input type="submit" name = "BpRetour" value="RETOUR">
