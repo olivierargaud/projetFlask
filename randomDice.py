@@ -19,8 +19,8 @@ class dice(db.Model):
     id = db.Column(db.Integer, primary_key = True)
     name = db.Column(db.String(200), nullable = False)
     value = db.Column(db.Integer, nullable = False)
-    # last_result = db.Column(db.Integer)
-    # owner = db.Column(db.String(200), nullable = False)
+    last_result = db.Column(db.Integer)
+    owner = db.Column(db.String(200), nullable = False)
     date_created = db.Column(db.DateTime, default = datetime.utcnow)
 
     def __repr__(self):
@@ -81,9 +81,13 @@ def validerLogin():
         error = None
         utilisateurEnBase = user.query.filter_by(login = username).first()
         if utilisateurEnBase:
-            # utilisateurActif = utilisateurEnBase.name
-            listeDe = dice.query.order_by(dice.name).all()
-            return render_template('pagePrincipale.html', listeDe=listeDe )
+            if check_password_hash(utilisateurEnBase.mdp, password):
+                utilisateurActif = utilisateurEnBase.login
+                print(utilisateurActif)
+                listeDe = dice.query.order_by(dice.name).all()
+                return render_template('pagePrincipale.html', listeDe=listeDe ,utilisateurActif = utilisateurActif)
+            else:
+                return redirect('/')
             # return render_template('pagePrincipale.html')
         else:
             flash("test flash 2")
@@ -227,8 +231,9 @@ def lancer(id):
 
     
     
-    resultat_lancer = random.randint (1,dice_to_launch.value)
-    print(resultat_lancer)
-
+    dice_to_launch.last_result = random.randint (1,dice_to_launch.value)
+    print(dice_to_launch.last_result)
+    db.session.commit()
+    
     listeDe = dice.query.order_by(dice.name).all()
-    return render_template('pagePrincipale.html', listeDe=listeDe , resultat = resultat_lancer)
+    return render_template('pagePrincipale.html', listeDe=listeDe)
