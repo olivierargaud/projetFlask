@@ -14,37 +14,59 @@
 <h1> page principale </h1>
 
 
-{% if listeDe|length < 1 %}
-    <h4 style = "text-align: center;">pas de Dé créé</h4>
+    {% if listeDe|length < 1 %}
+        <h4 style = "text-align: center;">pas de Dé créé</h4>
 
+        {% else %}
+
+    <table>
+        <tr>
+            <th>Nom du dé</th>
+            <th>Nb de face</th>
+            <th>dernier lancé</th>
+        </tr>
+        {% for dice in listeDe %}
+                <tr>
+                    <td>{{ dice.name }}</td>
+                    <td>{{ dice.value }}</td>
+                    <br>
+                    <td>{{ dice.last_result }}</td>
+                    <td>
+                        <a href="/lancer/{{dice.id}}">Lancer</a>
+                    </td>
+                </tr>
+            {% endfor %}
+    </table>
+    {% endif %}
+
+
+
+    {% if listeLance|length < 1 %}
+    <h4 style = "text-align: center;">pas de Lancé créé</h4>
+    
     {% else %}
-
-   <table>
-       <tr>
-           <th>Nom du dé</th>
-           <th>Nb de face</th>
-           <th>dernier lancé</th>
-       </tr>
-       {% for dice in listeDe %}
+    <h4>liste des lancés disponible</h4>
+    <table>
+    <tr>
+        <th>Nom du Lancé</th>
+        <th>Nombre de dé dans le lancé</th>
+        <th>owner</th>
+    </tr>
+    {% for dice_group in listeLance %}
             <tr>
-                <td>{{ dice.name }}</td>
-                <td>{{ dice.value }}</td>
+                <td>{{ dice_group.name }}</td>
                 <br>
-                <td>{{ dice.last_result }}</td>
+                <td>0</td>
+                <br>
+                <td>{{ dice_group.owner }}</td>
+    
                 <td>
-                    <a href="/suprimerDe/{{dice.id}}">Suprimer</a>
-                    <br>		
-                    <a href="/update/{{dice.id}}">Update</a>
-                    <br>		
-                    <a href="/lancer/{{dice.id}}">Lancer</a>
+                    <a href="/lancerGroupe/{{dice_group.id}}">lancer groupe</a>  
                 </td>
             </tr>
         {% endfor %}
-   </table>
-   {% endif %}
-
-
-
+    </table>
+    {% endif %}
 
 
 
@@ -52,10 +74,19 @@
 
 <br>
 <form action="/creationDe" method="POST">
-    <input type="submit" name = "BpCreationDe" value="CREER NOUVEAU DE">
+    <input type="submit" name = "BpCreationDe" value="AJOUT SUPPRESSION DE">
 </form>
 
 <br>
+
+
+<br>
+<form action="/creationLance" method="POST">
+    <input type="submit" name = "BpCreationLance" value="AJOUT SUPPRESSION LANCER">
+</form>
+
+<br>
+
 
 
 {% endblock %}

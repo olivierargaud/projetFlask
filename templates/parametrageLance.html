@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+
+
+
+{% block head %}
+  
+{% endblock %}
+
+
+
+
+{% block body %}
+
+<h1> parametrage de lancé </h1>
+<h1> nom du groupe : {{groupeSelectionne.name}} </h1>
+
+
+{% if listeDe|length < 1 %}
+<h4 style = "text-align: center;">pas de Dé créé</h4>
+
+{% else %}
+<h4>liste des dés disponible</h4>
+<table>
+    <tr>
+        <th>Nom du dé</th>
+        <th>Nb de face</th>
+    </tr>
+    {% for dice in listeDe %}
+            <tr>
+                <td>{{ dice.name }}</td>
+                <td>{{ dice.value }}</td>
+                <td>
+                    <a href="/ajouterAuLance/{{dice.id}}">ajouter</a>
+                </td>
+            </tr>
+    {% endfor %}
+</table>
+{% endif %}
+
+
+
+
+
+
+
+{% if listeDeGroupe|length < 1 %}
+<h4 style = "text-align: center;">pas de Dé dans ce groupe</h4>
+
+{% else %}
+<h4>liste des dés dans ce groupe</h4>
+<table>
+<tr>
+    <th>Nom du dé</th>
+    <th>Nb de face</th>
+</tr>
+{% for dice in listeDeGroupe %}
+        <tr>
+            <td>{{ dice.name }}</td>
+            <td>{{ dice.value }}</td>
+            <td>
+                <a href="/enleverAuLance/{{dice.id}}">enlever</a>
+            </td>
+        </tr>
+    {% endfor %}
+</table>
+{% endif %}
+
+
+
+<br>
+<form action="/creationLance" method="POST">
+    <input type="submit" name = "BpRetour" value="RETOUR">
+</form>
+
+<br>
+
+{% endblock %}

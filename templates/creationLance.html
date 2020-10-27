@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+
+
+
+{% block head %}
+  
+{% endblock %}
+
+
+
+
+{% block body %}
+
+<h1> création de lancé </h1>
+
+
+{% if listeLance|length < 1 %}
+<h4 style = "text-align: center;">pas de Lancé créé</h4>
+
+{% else %}
+<h4>liste des lancés disponible</h4>
+<table>
+<tr>
+    <th>Nom du Lancé</th>
+    <th>Nombre de dé dans le lancé</th>
+    <th>dernier lancé</th>
+</tr>
+{% for dice_group in listeLance %}
+        <tr>
+            <td>{{ dice_group.name }}</td>
+            <br>
+            <td>0</td>
+            <br>
+            <td>{{ dice_group.owner }}</td>
+
+            <td>
+                <a href="/suprimerLance/{{dice_group.id}}">Suprimer</a>
+                <br>		
+                <a href="/parametrerLance/{{dice_group.id}}">parametrer</a>
+               
+            </td>
+        </tr>
+    {% endfor %}
+</table>
+{% endif %}
+
+
+
+
+<br>
+<form action="/validerLance" method="POST">
+    <input type="text" name = "nomDuLance" value="" minlength="3" required>  nom du lancé ( min 3 caractères )
+    <br>
+    <input type="submit" name = "BpValiderLance" value="VALIDER LANCE">
+</form>
+
+<br>
+
+
+
+
+<br>
+<form action="/pagePrincipale" method="POST">
+    <input type="submit" name = "BpRetour" value="RETOUR">
+</form>
+
+<br>
+
+{% endblock %}

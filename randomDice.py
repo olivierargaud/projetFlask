@@ -44,7 +44,7 @@ class dice_list_group(db.Model):
     idGroup = db.Column(db.Integer, ForeignKey('dice_group.id'))
     
     def __repr__(self):
-        return '<idDice %r %r>' % (self.idDice , self.idGroup)
+        return '<idDice %r idGroup %r>' % (self.idDice , self.idGroup)
 
 
 class user(db.Model):
@@ -59,18 +59,10 @@ class user(db.Model):
 
 
 
-
-
-@app.route('/')
-def loginDeBase():
-     return render_template('login.html')
-
 @app.route('/',methods=['POST','GET'])
 def login():
-    if request.method == 'POST':
         return render_template('login.html')  
-    else:
-        return redirect('/')
+   
 
 @app.route('/login',methods=['POST','GET'])
 def validerLogin():
@@ -91,6 +83,8 @@ def validerLogin():
                 return redirect('/')
         else:
             return redirect('/')
+    else:
+            return redirect('/')
 
 @app.route('/logout',methods=['POST','GET'])
 def logout():
@@ -98,11 +92,9 @@ def logout():
 
         session.pop('username', None)
         return redirect('/')
-    
+    else:
+            return redirect('/')
 
-# @app.route('/nouveauCompte')
-# def nouveauCompteDeBase():
-#     return render_template('nouveauCompte.html')
 
 @app.route('/nouveauCompte',methods=['POST','GET'])
 def nouveauCompte():
@@ -110,6 +102,7 @@ def nouveauCompte():
         return render_template('nouveauCompte.html')  
     else:
         return redirect('/')
+
 
 @app.route('/validerNouveauCompte',methods=['POST','GET'])
 def validerNouveauCompte():
@@ -142,24 +135,20 @@ def validerNouveauCompte():
 
 
 
-@app.route('/pagePrincipale')
-def pagePrincBase():
-    if 'username' in session:
-        listeDe = dice.query.filter(dice.owner == session['username']).all()
-        return render_template('pagePrincipale.html', listeDe=listeDe ,utilisateurActif = session['username'])
-    else:
-        return redirect('/')
-
-
-
 @app.route('/pagePrincipale',methods=['POST','GET'])
 def pagePrinc():
     if request.method == 'POST':
 
         listeDe = dice.query.filter(dice.owner == session['username']).all()
-        return render_template('pagePrincipale.html', listeDe=listeDe ,utilisateurActif = session['username'])
+        listeLance = dice_group.query.filter(dice_group.owner == session['username']).all()
+        return render_template('pagePrincipale.html', listeDe=listeDe , listeLance=listeLance ,utilisateurActif = session['username'])
     else:
-        return redirect('/')
+        if 'username' in session:
+            listeDe = dice.query.filter(dice.owner == session['username']).all()
+            listeLance = dice_group.query.filter(dice_group.owner == session['username']).all()
+            return render_template('pagePrincipale.html', listeDe=listeDe , listeLance=listeLance ,utilisateurActif = session['username'])
+        else:
+            return redirect('/')
 
 
 
@@ -167,11 +156,10 @@ def pagePrinc():
 
 @app.route('/creationDe',methods=['POST','GET'])
 def creationDe():
-    if request.method == 'POST':
-        return render_template('creationDe.html',utilisateurActif = session['username'])  
-    else:
-        return redirect('/')
-
+    
+    listeDe = dice.query.filter(dice.owner == session['username']).all()
+    return render_template('creationDe.html', listeDe=listeDe ,utilisateurActif = session['username'])
+   
 
 
 
@@ -191,15 +179,15 @@ def validerDe():
             db.session.add(new_dice)
             db.session.commit()
             
-            return redirect('/pagePrincipale')
+            return redirect('/creationDe')
 
         except:
             return redirect('/creationDe')
 
        
-        return redirect('/pagePrincipale')
+        return redirect('/creationDe')
     else:
-        return redirect('/')
+        return redirect('/creationDe')
 
 
 
@@ -210,7 +198,7 @@ def suprimeDe(id):
     try:
         db.session.delete(dice_to_delete)
         db.session.commit()
-        return redirect('/pagePrincipale')
+        return redirect('/creationDe')
     except:
         return 'delete problem'
 
@@ -244,3 +232,75 @@ def lancer(id):
     db.session.commit()
     
     return redirect('/pagePrincipale')
+
+
+
+
+@app.route('/creationLance',methods=['POST','GET'])
+def creationLance():
+    if request.method == 'POST':
+        listeLance = dice_group.query.filter(dice_group.owner == session['username']).all()
+        return render_template('creationLance.html', listeLance=listeLance , utilisateurActif = session['username'])
+        return redirect('/')
+
+
+@app.route('/validerLance',methods=['POST','GET'])
+def validerLance():
+    if request.method == 'POST':
+
+        print (request.form['nomDuLance'])
+     
+        new_dice_group = dice_group(name=request.form['nomDuLance'])
+        new_dice_group.owner = session['username']
+        
+        try:
+            db.session.add(new_dice_group)
+            db.session.commit()
+            
+            return redirect('/pagePrincipale')
+
+        except:
+            return redirect('/creationLance')
+      
+        return redirect('/pagePrincipale')
+    else:
+        return redirect('/')
+
+
+
+@app.route('/suprimerLance/<int:id>')
+def suprimeLance(id):
+    dice_group_to_delete = dice_group.query.get_or_404(id)
+
+    try:
+        db.session.delete(dice_group_to_delete)
+        db.session.commit()
+        return redirect('/pagePrincipale')
+    except:
+        return 'delete problem'
+
+
+
+@app.route('/parametrerLance/<int:id>')
+def parametrerLance(id):
+    groupeSelectionne = dice_group.query.get_or_404(id)
+    session['idGroupeSelectionne'] = id
+    listeDe = dice.query.filter(dice.owner == session['username']).all()
+    # listeGroup = dice_list_group.query()
+    return render_template('parametrageLance.html', listeDe=listeDe , utilisateurActif = session['username'] , groupeSelectionne = groupeSelectionne)
+
+
+@app.route('/ajouterAuLance/<int:id>')
+def ajouterDe(id):
+    dice_to_add = dice.query.get_or_404(id)
+    group_to_add_dice = dice_group.query.get_or_404(session['idGroupeSelectionne'])
+
+    new_dice_list_group = dice_list_group( idDice=dice_to_add.id , idGroup=group_to_add_dice.id )
+    
+    db.session.add(new_dice_list_group)
+    db.session.commit()
+      
+    print(new_dice_list_group)
+
+    return redirect(url_for('parametrerLance', id=session['idGroupeSelectionne']))
+
