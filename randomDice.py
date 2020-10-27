@@ -11,7 +11,6 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///baseRandomDice.db'
 app.secret_key = 'maSuperClefSecrete'
 db = SQLAlchemy(app)
-utilisateurActif =""
 
 
 class dice(db.Model):
@@ -20,7 +19,7 @@ class dice(db.Model):
     name = db.Column(db.String(200), nullable = False)
     value = db.Column(db.Integer, nullable = False)
     last_result = db.Column(db.Integer)
-    owner = db.Column(db.String(200), nullable = False)
+    owner = db.Column(db.String(50), nullable = False)
     date_created = db.Column(db.DateTime, default = datetime.utcnow)
 
     def __repr__(self):
@@ -77,42 +76,19 @@ def validerLogin():
         password = request.form['mdp']
         print(username)
         print(password)
-        flash("test flash")
-        error = None
+       
         utilisateurEnBase = user.query.filter_by(login = username).first()
+
         if utilisateurEnBase:
             if check_password_hash(utilisateurEnBase.mdp, password):
-                utilisateurActif = utilisateurEnBase.login
-                print(utilisateurActif)
-                listeDe = dice.query.order_by(dice.name).all()
-                return render_template('pagePrincipale.html', listeDe=listeDe ,utilisateurActif = utilisateurActif)
+                session['username'] = username
+               
+                listeDe = dice.query.filter(dice.owner == session['username']).all()
+                return render_template('pagePrincipale.html', listeDe=listeDe ,utilisateurActif = session['username'])
             else:
                 return redirect('/')
             # return render_template('pagePrincipale.html')
-        else:
-            flash("test flash 2")
-        utilisateur = user.query.filter_by().first()
-        print(utilisateur)
-        
-        motdepass = user.query.filter_by().first().mdp
-        print(motdepass)
-
-        # utilisateur = db.Query.from_statement(db,'SELECT * FROM user WHERE login = logintest')
-        # user = db.execute('SELECT * FROM user WHERE login = ?', (username,)).fetchone()
-
-        # session.query(User).from_statement(text("SELECT * FROM users where name=:name")).params(name='ed').all()
-
-        # if utilisateur is None:
-        #     error = 'Incorrect username.'
-        # elif not check_password_hash(utilisateur['password'], password):
-        #     error = 'Incorrect password.'
-
-        # if error is None:
-        #     session.clear()
-        #     session['user_id'] = utilisateur['id']
-        #     return redirect(url_for('pagePrincipale'))
-
-        # flash(error)
+      
 
     
 
@@ -160,7 +136,7 @@ def validerNouveauCompte():
 @app.route('/creationDe',methods=['POST','GET'])
 def creationDe():
     if request.method == 'POST':
-        return render_template('creationDe.html')  
+        return render_template('creationDe.html',utilisateurActif = session['username'])  
     else:
         return redirect('/')
 
@@ -176,15 +152,18 @@ def validerDe():
        
 
         new_dice = dice(name=request.form['nomDuDe'],value = request.form['nbDeFace'])
+        new_dice.owner = session['username']
+        
 
         try:
             db.session.add(new_dice)
             db.session.commit()
-            listeDe = dice.query.order_by(dice.name).all()
-            return render_template('pagePrincipale.html', listeDe=listeDe )
+            
+            listeDe = dice.query.filter(dice.owner == session['username']).all()
+            return render_template('pagePrincipale.html', listeDe=listeDe , utilisateurActif = session['username'] )
 
         except:
-            return redirect('/nouveauCompte')
+            return redirect('/creationDe')
 
        
         return redirect('/pagePrincipale')
@@ -200,7 +179,8 @@ def delete(id):
     try:
         db.session.delete(dice_to_delete)
         db.session.commit()
-        return redirect('/')
+        listeDe = dice.query.filter(dice.owner == session['username']).all()   
+        return render_template('pagePrincipale.html', listeDe=listeDe , utilisateurActif = session['username'] )
     except:
         return 'delete problem'
 
@@ -229,11 +209,9 @@ def update(id):
 def lancer(id):
     dice_to_launch = dice.query.get_or_404(id)
 
-    
-    
     dice_to_launch.last_result = random.randint (1,dice_to_launch.value)
     print(dice_to_launch.last_result)
     db.session.commit()
     
-    listeDe = dice.query.order_by(dice.name).all()
-    return render_template('pagePrincipale.html', listeDe=listeDe)
+    listeDe = dice.query.filter(dice.owner == session['username']).all()
+    return render_template('pagePrincipale.html', listeDe=listeDe, utilisateurActif = session['username'] )
