@@ -18,7 +18,12 @@
 
 <body>
     <h3> utilisateur loggé :{{utilisateurActif}}</h3>
-
+    <br>
+    <form action="/logout" method="POST">
+        <input type="submit" name = "BpLogout" value="LOGOUT">
+    </form>
+    
+    <br>
     {% block body %}
     {% endblock %}
 

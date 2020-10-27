@@ -30,8 +30,8 @@ class dice_group(db.Model):
     """ table qui definit les groupe de dés (lancer plusieurs dés) """
     id = db.Column(db.Integer, primary_key = True)
     name = db.Column(db.String(200), nullable = False)
+    owner = db.Column(db.String(50), nullable = False)
     date_created = db.Column(db.DateTime, default = datetime.utcnow)
-    children = db.relationship("dice_list_group")
 
     def __repr__(self):
         return '<groupe %r>' % (self.name)
@@ -40,7 +40,7 @@ class dice_group(db.Model):
 class dice_list_group(db.Model):
     """ table de liaison entre les dés et les groupes de dés """
     id = db.Column(db.Integer, primary_key = True)
-    idDice = db.Column(db.Integer)
+    idDice = db.Column(db.Integer, ForeignKey('dice.id'))
     idGroup = db.Column(db.Integer, ForeignKey('dice_group.id'))
     
     def __repr__(self):
@@ -53,9 +53,12 @@ class user(db.Model):
     mdp = db.Column(db.String(200), nullable = False)
     date_created = db.Column(db.DateTime, default = datetime.utcnow)
 
-
     def __repr__(self):
         return '<User %r >' % self.login 
+
+
+
+
 
 
 @app.route('/')
@@ -82,14 +85,19 @@ def validerLogin():
         if utilisateurEnBase:
             if check_password_hash(utilisateurEnBase.mdp, password):
                 session['username'] = username
-               
-                listeDe = dice.query.filter(dice.owner == session['username']).all()
-                return render_template('pagePrincipale.html', listeDe=listeDe ,utilisateurActif = session['username'])
+                
+                return redirect('/pagePrincipale')
             else:
                 return redirect('/')
-            # return render_template('pagePrincipale.html')
-      
+        else:
+            return redirect('/')
 
+@app.route('/logout',methods=['POST','GET'])
+def logout():
+    if request.method == 'POST':
+
+        session.pop('username', None)
+        return redirect('/')
     
 
 # @app.route('/nouveauCompte')
@@ -133,6 +141,30 @@ def validerNouveauCompte():
 
 
 
+
+@app.route('/pagePrincipale')
+def pagePrincBase():
+    if 'username' in session:
+        listeDe = dice.query.filter(dice.owner == session['username']).all()
+        return render_template('pagePrincipale.html', listeDe=listeDe ,utilisateurActif = session['username'])
+    else:
+        return redirect('/')
+
+
+
+@app.route('/pagePrincipale',methods=['POST','GET'])
+def pagePrinc():
+    if request.method == 'POST':
+
+        listeDe = dice.query.filter(dice.owner == session['username']).all()
+        return render_template('pagePrincipale.html', listeDe=listeDe ,utilisateurActif = session['username'])
+    else:
+        return redirect('/')
+
+
+
+
+
 @app.route('/creationDe',methods=['POST','GET'])
 def creationDe():
     if request.method == 'POST':
@@ -159,8 +191,7 @@ def validerDe():
             db.session.add(new_dice)
             db.session.commit()
             
-            listeDe = dice.query.filter(dice.owner == session['username']).all()
-            return render_template('pagePrincipale.html', listeDe=listeDe , utilisateurActif = session['username'] )
+            return redirect('/pagePrincipale')
 
         except:
             return redirect('/creationDe')
@@ -172,15 +203,14 @@ def validerDe():
 
 
 
-@app.route('/delete/<int:id>')
-def delete(id):
+@app.route('/suprimerDe/<int:id>')
+def suprimeDe(id):
     dice_to_delete = dice.query.get_or_404(id)
 
     try:
         db.session.delete(dice_to_delete)
         db.session.commit()
-        listeDe = dice.query.filter(dice.owner == session['username']).all()   
-        return render_template('pagePrincipale.html', listeDe=listeDe , utilisateurActif = session['username'] )
+        return redirect('/pagePrincipale')
     except:
         return 'delete problem'
 
@@ -213,5 +243,4 @@ def lancer(id):
     print(dice_to_launch.last_result)
     db.session.commit()
     
-    listeDe = dice.query.filter(dice.owner == session['username']).all()
-    return render_template('pagePrincipale.html', listeDe=listeDe, utilisateurActif = session['username'] )
+    return redirect('/pagePrincipale')
