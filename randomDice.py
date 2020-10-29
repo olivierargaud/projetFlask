@@ -33,6 +33,7 @@ class dice_group(db.Model):
     id = db.Column(db.Integer, primary_key = True)
     name = db.Column(db.String(200), nullable = False)
     owner = db.Column(db.String(50), nullable = False)
+    last_result = db.Column(db.Integer)
     date_created = db.Column(db.DateTime, default = datetime.utcnow)
 
     def __repr__(self):
@@ -44,6 +45,7 @@ class dice_list_group(db.Model):
     id = db.Column(db.Integer, primary_key = True)
     idDice = db.Column(db.Integer, ForeignKey('dice.id'))
     idGroup = db.Column(db.Integer, ForeignKey('dice_group.id'))
+    last_result = db.Column(db.Integer)
     
     def __repr__(self):
         return '<idDice %r idGroup %r>' % (self.idDice , self.idGroup)
@@ -327,3 +329,35 @@ def enleverDe(id):
     db.session.commit()
       
     return redirect(url_for('parametrerLance', id=session['idGroupeSelectionne']))
+
+
+
+
+
+@app.route('/lancerGroupe/<int:id>')
+def lancerGroup(id):
+    # declaration et initialisation de la variable resultat du lancé
+    resultatLance = 0
+    # recuperation du groupe sur lequel effectuer le lancé
+    dice_group_to_launch = dice_group.query.get_or_404(id)
+    # list des jonction du groupe selectionné
+    listeJonction = dice_list_group.query.filter(dice_list_group.idGroup == dice_group_to_launch.id).all()
+   
+   
+   
+    for jonction in listeJonction:
+        print (jonction.id)
+        deSelect = dice.query.filter(dice.id == jonction.idDice).first()
+        print (deSelect.name)
+        dice_result = random.randint (1,deSelect.value)
+        resultatLance += dice_result
+        print('resultat individuel ' + str(dice_result))
+
+
+    
+    print('resultat total ' + str(resultatLance))
+    dice_group_to_launch.last_result = resultatLance
+    db.session.commit()
+
+    
+    return redirect('/pagePrincipale')

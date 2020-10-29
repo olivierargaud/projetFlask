@@ -51,6 +51,7 @@
         <th>Nom du Lancé</th>
         <th>Nombre de dé dans le lancé</th>
         <th>owner</th>
+        <th>dernier resultat</th>
     </tr>
     {% for dice_group in listeLance %}
             <tr>
@@ -59,7 +60,7 @@
                 <td>0</td>
                 <br>
                 <td>{{ dice_group.owner }}</td>
-    
+                <td>{{ dice_group.last_result }}</td>
                 <td>
                     <a href="/lancerGroupe/{{dice_group.id}}">lancer groupe</a>  
                 </td>
@@ -74,7 +75,7 @@
 
 <br>
 <form action="/creationDe" method="POST">
-    <input type="submit" name = "BpCreationDe" value="AJOUT SUPPRESSION DE">
+    <input type="submit" name = "BpCreationDe" value="GESTION DÉ">
 </form>
 
 <br>
@@ -82,7 +83,7 @@
 
 <br>
 <form action="/creationLance" method="POST">
-    <input type="submit" name = "BpCreationLance" value="AJOUT SUPPRESSION LANCER">
+    <input type="submit" name = "BpCreationLance" value="GESTION LANCÉ">
 </form>
 
 <br>
