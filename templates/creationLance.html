@@ -34,10 +34,12 @@
             <td>{{ dice_group.owner }}</td>
 
             <td>
-                <a href="/suprimerLance/{{dice_group.id}}">Suprimer</a>
-                <br>		
-                <a href="/parametrerLance/{{dice_group.id}}">parametrer</a>
-               
+                <form action="/suprimerLance/{{dice_group.id}}" method="POST">
+                    <input type="submit" name = "BpSuprimer" value="SUPPRIMER">
+                </form>
+                <form action="/parametrerLance/{{dice_group.id}}" method="POST">
+                    <input type="submit" name = "BpParametrer" value="PARAMETRER">
+                </form>               
             </td>
         </tr>
     {% endfor %}

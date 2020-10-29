@@ -33,9 +33,12 @@
             <br>
             <td>{{ dice.last_result }}</td>
             <td>
-                <a href="/suprimerDe/{{dice.id}}">Suprimer</a>
-                <br>		
-                <a href="/update/{{dice.id}}">Update</a>
+                <form action="/suprimerDe/{{dice.id}}" method="POST">
+                    <input type="submit" name = "BpSuprimer" value="SUPPRIMER">
+                </form>
+                <form action="/update/{{dice.id}}" method="POST">
+                    <input type="submit" name = "BpModifier" value="MODIFIER">
+                </form>
             </td>
         </tr>
     {% endfor %}

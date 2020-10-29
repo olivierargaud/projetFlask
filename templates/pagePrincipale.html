@@ -32,7 +32,9 @@
                     <br>
                     <td>{{ dice.last_result }}</td>
                     <td>
-                        <a href="/lancer/{{dice.id}}">Lancer</a>
+                        <form action="/lancer/{{dice.id}}" method="POST">
+                            <input type="submit" name = "BpLancer" value="LANCER">
+                        </form>
                     </td>
                 </tr>
             {% endfor %}
@@ -62,7 +64,9 @@
                 <td>{{ dice_group.owner }}</td>
                 <td>{{ dice_group.last_result }}</td>
                 <td>
-                    <a href="/lancerGroupe/{{dice_group.id}}">lancer groupe</a>  
+                    <form action="/lancerGroupe/{{dice_group.id}}" method="POST">
+                        <input type="submit" name = "BpLancer" value="LANCER GROUPE">
+                    </form>
                 </td>
             </tr>
         {% endfor %}

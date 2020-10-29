@@ -195,7 +195,7 @@ def validerDe():
 
 
 
-@app.route('/suprimerDe/<int:id>')
+@app.route('/suprimerDe/<int:id>',methods=['POST','GET'])
 def suprimeDe(id):
     dice_to_delete = dice.query.get_or_404(id)
 
@@ -227,7 +227,7 @@ def update(id):
         return render_template('update.html',dice = dice_to_update)
 
 
-@app.route('/lancer/<int:id>')
+@app.route('/lancer/<int:id>',methods=['POST','GET'])
 def lancer(id):
     dice_to_launch = dice.query.get_or_404(id)
 
@@ -272,7 +272,7 @@ def validerLance():
 
 
 
-@app.route('/suprimerLance/<int:id>')
+@app.route('/suprimerLance/<int:id>',methods=['POST','GET'])
 def suprimeLance(id):
     dice_group_to_delete = dice_group.query.get_or_404(id)
 
@@ -285,7 +285,7 @@ def suprimeLance(id):
 
 
 
-@app.route('/parametrerLance/<int:id>')
+@app.route('/parametrerLance/<int:id>',methods=['POST','GET'])
 def parametrerLance(id):
     
     groupeSelectionne = dice_group.query.get_or_404(id)
@@ -303,7 +303,7 @@ def parametrerLance(id):
     return render_template('parametrageLance.html', listeDe=listeDe , listeDeGroupe=listeDeGroupe , listeJonction=listeJonction , utilisateurActif = session['username'] , groupeSelectionne = groupeSelectionne)
 
 
-@app.route('/ajouterAuLance/<int:id>')
+@app.route('/ajouterAuLance/<int:id>',methods=['POST','GET'])
 def ajouterDe(id):
     dice_to_add = dice.query.get_or_404(id)
     group_to_add_dice = dice_group.query.get_or_404(session['idGroupeSelectionne'])
@@ -318,7 +318,7 @@ def ajouterDe(id):
     return redirect(url_for('parametrerLance', id=session['idGroupeSelectionne']))
 
 
-@app.route('/enleverAuLance/<int:id>')
+@app.route('/enleverAuLance/<int:id>',methods=['POST','GET'])
 def enleverDe(id):
     # dice_to_remove = dice.query.get_or_404(id)
     # group_to_remove_dice = dice_group.query.get_or_404(session['idGroupeSelectionne'])
@@ -334,7 +334,7 @@ def enleverDe(id):
 
 
 
-@app.route('/lancerGroupe/<int:id>')
+@app.route('/lancerGroupe/<int:id>',methods=['POST','GET'])
 def lancerGroup(id):
     # declaration et initialisation de la variable resultat du lancé
     resultatLance = 0

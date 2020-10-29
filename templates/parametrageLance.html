@@ -31,42 +31,14 @@
             <td>{{ dice.name }}</td>
             <td>{{ dice.value }}</td>
             <td>
-                <a href="/ajouterAuLance/{{dice.id}}">ajouter</a>
+                <form action="/ajouterAuLance/{{dice.id}}" method="POST">
+                    <input type="submit" name = "BpAjouter" value="AJOUTER">
+                </form>  
             </td>
         </tr>
     {% endfor %}
 </table>
 {% endif %}
-
-
-
-
-
-
-
-{% if listeDeGroupe|length < 1 %}
-<h4>pas de Dé dans ce groupe</h4>
-
-{% else %}
-<h4>liste des dés dans ce groupe</h4>
-<table>
-<tr>
-    <th>Nom du dé</th>
-    <th>Nb de face</th>
-</tr>
-{% for dice in listeDeGroupe %}
-        <tr>
-            <td>{{ dice.name }}</td>
-            <td>{{ dice.value }}</td>
-            <td>
-                <a href="/enleverAuLance/{{dice.id}}">enlever</a>
-            </td>
-        </tr>
-    {% endfor %}
-</table>
-{% endif %}
-
-
 
 
 
@@ -100,7 +72,9 @@
                         <td>{{ dice.name }}</td>
                         <td>{{ dice.value }}</td>
                         <td>
-                            <a href="/enleverAuLance/{{dice_list_group.id}}">test</a>
+                            <form action="/enleverAuLance/{{dice_list_group.id}}" method="POST">
+                                <input type="submit" name = "BpEnleverAuLance" value="RETIRER">
+                            </form>    
                         </td>
                     </tr>
                 
@@ -110,9 +84,6 @@
 
         {% endif %}
         
-    
-    
-
     
     {% endfor %}
 
