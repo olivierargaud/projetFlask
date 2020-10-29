@@ -16,7 +16,7 @@
 
 
 {% if listeDe|length < 1 %}
-<h4 style = "text-align: center;">pas de Dé créé</h4>
+<h4>pas de Dé créé</h4>
 
 {% else %}
 <h4>liste des dés disponible</h4>
@@ -25,14 +25,15 @@
         <th>Nom du dé</th>
         <th>Nb de face</th>
     </tr>
+ 
     {% for dice in listeDe %}
-            <tr>
-                <td>{{ dice.name }}</td>
-                <td>{{ dice.value }}</td>
-                <td>
-                    <a href="/ajouterAuLance/{{dice.id}}">ajouter</a>
-                </td>
-            </tr>
+        <tr>
+            <td>{{ dice.name }}</td>
+            <td>{{ dice.value }}</td>
+            <td>
+                <a href="/ajouterAuLance/{{dice.id}}">ajouter</a>
+            </td>
+        </tr>
     {% endfor %}
 </table>
 {% endif %}
@@ -44,7 +45,7 @@
 
 
 {% if listeDeGroupe|length < 1 %}
-<h4 style = "text-align: center;">pas de Dé dans ce groupe</h4>
+<h4>pas de Dé dans ce groupe</h4>
 
 {% else %}
 <h4>liste des dés dans ce groupe</h4>
@@ -64,6 +65,80 @@
     {% endfor %}
 </table>
 {% endif %}
+
+
+
+
+
+
+
+{% if listeJonction|length < 1 %}
+<h4>pas de jonction</h4>
+
+{% else %}
+<h4>liste des jonction dans ce groupe</h4>
+<table>
+    <tr>
+        <th> id jonction </th>
+        <th> nom dé </th>
+        <th> nombre de face </th>
+    </tr>
+
+    {% for dice_list_group in listeJonction %}
+
+
+        {% if listeDe|length < 1 %}
+        
+        {% else %}
+    
+            {% for dice in listeDe %}
+
+                {% if dice.id == dice_list_group.idDice %}
+
+                    <tr>
+                        <td>{{ dice_list_group.id }}</td>
+                        <td>{{ dice.name }}</td>
+                        <td>{{ dice.value }}</td>
+                        <td>
+                            <a href="/enleverAuLance/{{dice_list_group.id}}">test</a>
+                        </td>
+                    </tr>
+                
+                {% endif %}
+        
+            {% endfor %}
+
+        {% endif %}
+        
+    
+    
+
+    
+    {% endfor %}
+
+
+</table>
+{% endif %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

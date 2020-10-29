@@ -22,6 +22,8 @@ class dice(db.Model):
     owner = db.Column(db.String(50), nullable = False)
     date_created = db.Column(db.DateTime, default = datetime.utcnow)
 
+    group = db.relationship('dice_list_group', backref=db.backref('dice', lazy='joined'))
+
     def __repr__(self):
         return '<Dé %r %r>' % (self.name , self.value)
 
@@ -123,7 +125,7 @@ def validerNouveauCompte():
             try:
                 db.session.add(new_user)
                 db.session.commit()
-                return render_template('pagePrincipale.html')
+                return redirect('/')
 
             except:
                 return redirect('/nouveauCompte')
@@ -283,11 +285,20 @@ def suprimeLance(id):
 
 @app.route('/parametrerLance/<int:id>')
 def parametrerLance(id):
+    
     groupeSelectionne = dice_group.query.get_or_404(id)
     session['idGroupeSelectionne'] = id
+    
     listeDe = dice.query.filter(dice.owner == session['username']).all()
-    # listeGroup = dice_list_group.query()
-    return render_template('parametrageLance.html', listeDe=listeDe , utilisateurActif = session['username'] , groupeSelectionne = groupeSelectionne)
+    print(listeDe)
+    listeDeGroupe = dice.query.filter(dice.group.any(dice_list_group.idGroup == groupeSelectionne.id)).all()
+    print(dice.query.filter(dice.group.any(dice_list_group.idGroup == groupeSelectionne.id)))
+    print(listeDeGroupe)
+
+    listeJonction = dice_list_group.query.filter(dice_list_group.idGroup == groupeSelectionne.id).all()
+    print(listeJonction)
+    
+    return render_template('parametrageLance.html', listeDe=listeDe , listeDeGroupe=listeDeGroupe , listeJonction=listeJonction , utilisateurActif = session['username'] , groupeSelectionne = groupeSelectionne)
 
 
 @app.route('/ajouterAuLance/<int:id>')
@@ -304,3 +315,15 @@ def ajouterDe(id):
 
     return redirect(url_for('parametrerLance', id=session['idGroupeSelectionne']))
 
+
+@app.route('/enleverAuLance/<int:id>')
+def enleverDe(id):
+    # dice_to_remove = dice.query.get_or_404(id)
+    # group_to_remove_dice = dice_group.query.get_or_404(session['idGroupeSelectionne'])
+
+    dice_list_group_to_remove = dice_list_group.query.get_or_404(id)
+
+    db.session.delete(dice_list_group_to_remove)
+    db.session.commit()
+      
+    return redirect(url_for('parametrerLance', id=session['idGroupeSelectionne']))
