@@ -34,6 +34,7 @@ class dice_group(db.Model):
     name = db.Column(db.String(200), nullable = False)
     owner = db.Column(db.String(50), nullable = False)
     last_result = db.Column(db.Integer)
+    nb_de = db.Column(db.Integer)
     date_created = db.Column(db.DateTime, default = datetime.utcnow)
 
     def __repr__(self):
@@ -261,6 +262,7 @@ def validerLance():
      
         new_dice_group = dice_group(name=request.form['nomDuLance'])
         new_dice_group.owner = session['username']
+        new_dice_group.nb_de = 0
         
         db.session.add(new_dice_group)
         db.session.commit()
@@ -310,6 +312,7 @@ def ajouterDe(id):
     new_dice_list_group = dice_list_group( idDice=dice_to_add.id , idGroup=group_to_add_dice.id )
     
     db.session.add(new_dice_list_group)
+    group_to_add_dice.nb_de +=1
     db.session.commit()
       
     print(new_dice_list_group)
@@ -320,11 +323,12 @@ def ajouterDe(id):
 @app.route('/enleverAuLance/<int:id>',methods=['POST','GET'])
 def enleverDe(id):
     # dice_to_remove = dice.query.get_or_404(id)
-    # group_to_remove_dice = dice_group.query.get_or_404(session['idGroupeSelectionne'])
+    group_to_remove_dice = dice_group.query.get_or_404(session['idGroupeSelectionne'])
 
     dice_list_group_to_remove = dice_list_group.query.get_or_404(id)
 
     db.session.delete(dice_list_group_to_remove)
+    group_to_remove_dice.nb_de -=1
     db.session.commit()
       
     return redirect(url_for('parametrerLance', id=session['idGroupeSelectionne']))
@@ -351,6 +355,8 @@ def lancerGroup(id):
         dice_result = random.randint (1,deSelect.value)
         resultatLance += dice_result
         print('resultat individuel ' + str(dice_result))
+        jonction.last_result = dice_result
+        
 
 
     
