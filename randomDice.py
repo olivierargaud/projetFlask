@@ -310,9 +310,10 @@ def ajouterDe(id):
     group_to_add_dice = dice_group.query.get_or_404(session['idGroupeSelectionne'])
 
     new_dice_list_group = dice_list_group( idDice=dice_to_add.id , idGroup=group_to_add_dice.id )
-    
     db.session.add(new_dice_list_group)
-    group_to_add_dice.nb_de +=1
+   
+    nb_de_de_dans_jonction = dice_list_group.query.filter(dice_list_group.idGroup == group_to_add_dice.id).count()
+    group_to_add_dice.nb_de = nb_de_de_dans_jonction
     db.session.commit()
       
     print(new_dice_list_group)
@@ -326,9 +327,10 @@ def enleverDe(id):
     group_to_remove_dice = dice_group.query.get_or_404(session['idGroupeSelectionne'])
 
     dice_list_group_to_remove = dice_list_group.query.get_or_404(id)
-
     db.session.delete(dice_list_group_to_remove)
-    group_to_remove_dice.nb_de -=1
+
+    nb_de_de_dans_jonction = dice_list_group.query.filter(dice_list_group.idGroup == group_to_remove_dice.id).count()
+    group_to_remove_dice.nb_de = nb_de_de_dans_jonction
     db.session.commit()
       
     return redirect(url_for('parametrerLance', id=session['idGroupeSelectionne']))
