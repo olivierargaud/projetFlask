@@ -160,10 +160,16 @@ def pagePrinc():
 
 @app.route('/creationDe',methods=['POST','GET'])
 def creationDe():
-    
-    listeDe = dice.query.filter(dice.owner == session['username']).all()
-    return render_template('creationDe.html', listeDe=listeDe ,utilisateurActif = session['username'])
-   
+    if request.method == 'POST':
+        listeDe = dice.query.filter(dice.owner == session['username']).all()
+        return render_template('creationDe.html', listeDe=listeDe ,utilisateurActif = session['username'])
+    else:
+
+        if 'username' in session:
+            listeDe = dice.query.filter(dice.owner == session['username']).all()
+            return render_template('creationDe.html', listeDe=listeDe  ,utilisateurActif = session['username'])
+        else:
+            return redirect('/')
 
 
 
@@ -174,24 +180,18 @@ def validerDe():
         print (request.form['nomDuDe'])
         print (request.form['nbDeFace'])
        
-
         new_dice = dice(name=request.form['nomDuDe'],value = request.form['nbDeFace'])
         new_dice.owner = session['username']
+
+        db.session.add(new_dice)
+        db.session.commit()
         
-
-        try:
-            db.session.add(new_dice)
-            db.session.commit()
-            
-            return redirect('/creationDe')
-
-        except:
-            return redirect('/creationDe')
-
-       
         return redirect('/creationDe')
     else:
-        return redirect('/creationDe')
+        if 'username' in session:
+            return redirect('/creationDe')
+        else:
+            return redirect('/')
 
 
 
@@ -244,8 +244,13 @@ def lancer(id):
 def creationLance():
     if request.method == 'POST':
         listeLance = dice_group.query.filter(dice_group.owner == session['username']).all()
-        return render_template('creationLance.html', listeLance=listeLance , utilisateurActif = session['username'])
-        return redirect('/')
+        return render_template('creationLance.html', listeLance=listeLance , utilisateurActif = session['username']) 
+    else:
+        if 'username' in session:
+            listeLance = dice_group.query.filter(dice_group.owner == session['username']).all()
+            return render_template('creationLance.html', listeLance=listeLance , utilisateurActif = session['username'])
+        else:
+            return redirect('/')
 
 
 @app.route('/validerLance',methods=['POST','GET'])
@@ -257,16 +262,10 @@ def validerLance():
         new_dice_group = dice_group(name=request.form['nomDuLance'])
         new_dice_group.owner = session['username']
         
-        try:
-            db.session.add(new_dice_group)
-            db.session.commit()
-            
-            return redirect('/pagePrincipale')
-
-        except:
-            return redirect('/creationLance')
-      
-        return redirect('/pagePrincipale')
+        db.session.add(new_dice_group)
+        db.session.commit()
+        
+        return redirect('/creationLance')
     else:
         return redirect('/')
 
@@ -279,7 +278,7 @@ def suprimeLance(id):
     try:
         db.session.delete(dice_group_to_delete)
         db.session.commit()
-        return redirect('/pagePrincipale')
+        return redirect('/creationLance')
     except:
         return 'delete problem'
 

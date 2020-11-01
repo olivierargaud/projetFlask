@@ -17,8 +17,8 @@
     {% if listeDe|length < 1 %}
         <h4 style = "text-align: center;">pas de Dé créé</h4>
 
-        {% else %}
-
+    {% else %}
+    <h3>liste des dés disponible</h3>
     <table>
         <tr>
             <th>Nom du dé</th>
@@ -43,11 +43,20 @@
 
 
 
+
+    <br>
+    <form action="/creationDe" method="POST">
+        <input type="submit" name = "BpCreationDe" value="GESTION DÉ">
+    </form>
+    
+    <br>
+    
+
     {% if listeLance|length < 1 %}
     <h4 style = "text-align: center;">pas de Lancé créé</h4>
     
     {% else %}
-    <h4>liste des lancés disponible</h4>
+    <h3>liste des lancés disponible</h3>
     <table>
     <tr>
         <th>Nom du Lancé</th>
@@ -74,15 +83,6 @@
     {% endif %}
 
 
-
-
-
-<br>
-<form action="/creationDe" method="POST">
-    <input type="submit" name = "BpCreationDe" value="GESTION DÉ">
-</form>
-
-<br>
 
 
 <br>
