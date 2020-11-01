@@ -44,8 +44,8 @@ class dice_group(db.Model):
 class dice_list_group(db.Model):
     """ table de liaison entre les dés et les groupes de dés """
     id = db.Column(db.Integer, primary_key = True)
-    idDice = db.Column(db.Integer, ForeignKey('dice.id'))
-    idGroup = db.Column(db.Integer, ForeignKey('dice_group.id'))
+    idDice = db.Column(db.Integer, ForeignKey('dice.id'), nullable = False)
+    idGroup = db.Column(db.Integer, ForeignKey('dice_group.id'), nullable = False)
     last_result = db.Column(db.Integer)
     
     def __repr__(self):
