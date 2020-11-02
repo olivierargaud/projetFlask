@@ -1,15 +1,25 @@
-{% extends 'base.html' %}
-
-{% block title%}Login Page{% endblock %}
+{% extends "base.html" %}
 
 {% block content %}
-
-<form action="#" method="POST">
-    <p>Login :</p>
-    <input type="text" name="">
-    <p>Password :</p>
-    <input type="password" name="">
-    <p><input type="button" value="Login"></p>
-</form>
+<section>
+<h3 class="title">Login</h3>
+<div>
+    <form method="POST" action="/login">
+        <div class="email">
+            <input class="input is-large" type="email" name="email" placeholder="Your Email" autofocus="">
+        </div>
+        <div class="password">
+            <input class="input is-large" type="password" name="password" placeholder="Your Password">
+        </div>
+        <div>
+            <label class="checkbox">
+                <input type="checkbox">
+                Remember me
+            </label>
+        </div>
+        <button class="button is-block is-info is-large is-fullwidth">Login</button>
+    </form>
+</div>
+</section>
 
 {% endblock %}
