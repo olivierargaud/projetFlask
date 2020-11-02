@@ -4,6 +4,13 @@
 <section>
 <h3 class="title">Login</h3>
 <div>
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+    <div>
+        {{ messages[0] }}
+    </div>
+{% endif %}
+{% endwith %}
     <form method="POST" action="/login">
         <div class="email">
             <input class="input is-large" type="email" name="email" placeholder="Your Email" autofocus="">

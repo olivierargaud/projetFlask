@@ -2,6 +2,7 @@
 
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+from flask_login import LoginManager
 
 # init SQLAlchemy so we can use it later in our models
 db = SQLAlchemy()
@@ -22,75 +23,17 @@ def create_app():
     from .main import main as main_blueprint
     app.register_blueprint(main_blueprint)
 
+    db.init_app(app)
+
+    login_manager = LoginManager()
+    login_manager.login_view = 'auth.login'
+    login_manager.init_app(app)
+
+    from .models import User
+
+    @login_manager.user_loader
+    def load_user(user_id):
+        # since the user_id is just the primary key of our user table, use it in the query for the user
+        return User.query.get(int(user_id))
+
     return app
-
-
-
-
-
-
-
-
-
-
-
-# class User:
-#     def __init__(self, id, username, password):
-#         self.id = id
-#         self.username = username
-#         self.password = password
-    
-#     def __repr__(self):
-#         return f'<User : {self.username}>'
-    
-# users = []
-# users.append(User(id=1, username='Mathis', password='password'))
-# users.append(User(id=2, username='Olivier', password='secret'))
-
-# def create_app():
-#     app = Flask(__name__)
-#     app.secret_key = 'motdepasse'
-
-#     @app.before_request
-#     def before_request():
-#         if 'user_id' in session:
-#             user = [x for x in users if x.id == session['user_id']][0]
-#             g.user = user
-
-
-#     @app.route('/')
-#     def homepage():
-#         return render_template('homepage.html')
-
-#     @app.route('/historique/')
-#     def historique():
-#         return render_template('historique.html')
-
-#     @app.route("/login/", methods=["POST", "GET"])
-#     def login():
-#         if request.method == "POST":
-#             session.pop('user_id', None)
-#             username = request.form['username']
-#             password = request.form['password']
-            
-#             user = [x for x in users if x.username == username][0]
-#             if user and user.password == password:
-#                 session['user_id'] = user.id
-#                 return redirect(url_for('profile'))
-
-#             return redirect(url_for('login'))
-
-#         return render_template("login.html")
-
-
-#     @app.route("/profile/")
-#     def profile():
-#         if not g.user:
-#             return redirect(url_for('login'))
-#         return render_template("profile.html")
-
-#     @app.route("/<usr>/")
-#     def user(usr):
-#         return f"<h1>{usr}</h1>"
-
-#     return app
