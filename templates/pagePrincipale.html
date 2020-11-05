@@ -3,7 +3,6 @@
 
 
 {% block head %}
-   <title>Random Dice Page Principale</title>
 {% endblock %}
 
 
@@ -11,8 +10,7 @@
 
 {% block body %}
 
-<h1> page principale </h1>
-
+    <h1> page principale </h1>
 
     {% if listeDe|length < 1 %}
         <h4 style = "text-align: center;">pas de Dé créé</h4>
@@ -44,12 +42,6 @@
 
 
 
-    <br>
-    <form action="/creationDe" method="POST">
-        <input type="submit" name = "BpCreationDe" value="GESTION DÉ">
-    </form>
-    
-    <br>
     
 
     {% if listeLance|length < 1 %}
@@ -58,13 +50,13 @@
     {% else %}
     <h3>liste des lancés disponible</h3>
     <table>
-    <tr>
-        <th>Nom du Lancé</th>
-        <th>Nombre de dé dans le lancé</th>
-        <th>owner</th>
-        <th>dernier resultat</th>
-    </tr>
-    {% for dice_group in listeLance %}
+        <tr>
+            <th>Nom du Lancé</th>
+            <th>Nombre de dé dans le lancé</th>
+            <th>owner</th>
+            <th>dernier resultat</th>
+        </tr>
+        {% for dice_group in listeLance %}
             <tr>
                 <td>{{ dice_group.name }}</td>
                 <br>
@@ -81,16 +73,6 @@
         {% endfor %}
     </table>
     {% endif %}
-
-
-
-
-<br>
-<form action="/creationLance" method="POST">
-    <input type="submit" name = "BpCreationLance" value="GESTION LANCÉ">
-</form>
-
-<br>
 
 
 

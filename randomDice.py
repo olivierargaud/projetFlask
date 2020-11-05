@@ -13,6 +13,15 @@ app.secret_key = 'maSuperClefSecrete'
 db = SQLAlchemy(app)
 
 
+
+######################################################################################################################################################
+#                                                                                                                                                    #
+######################################################################################################################################################
+
+
+########################################################################################
+#                                                                                      #
+########################################################################################
 class dice(db.Model):
     """ table qui definit les dés """
     id = db.Column(db.Integer, primary_key = True)
@@ -27,9 +36,11 @@ class dice(db.Model):
     def __repr__(self):
         return '<Dé %r %r>' % (self.name , self.value)
 
-
+########################################################################################
+#                                                                                      #
+########################################################################################
 class dice_group(db.Model):
-    """ table qui definit les groupe de dés (lancer plusieurs dés) """
+    """ table qui definit les groupes de dés (lancer plusieurs dés) """
     id = db.Column(db.Integer, primary_key = True)
     name = db.Column(db.String(200), nullable = False)
     owner = db.Column(db.String(50), nullable = False)
@@ -40,7 +51,9 @@ class dice_group(db.Model):
     def __repr__(self):
         return '<groupe %r>' % (self.name)
 
-
+########################################################################################
+#                                                                                      #
+########################################################################################
 class dice_list_group(db.Model):
     """ table de liaison entre les dés et les groupes de dés """
     id = db.Column(db.Integer, primary_key = True)
@@ -51,7 +64,9 @@ class dice_list_group(db.Model):
     def __repr__(self):
         return '<idDice %r idGroup %r>' % (self.idDice , self.idGroup)
 
-
+########################################################################################
+#                                                                                      #
+########################################################################################
 class user(db.Model):
     """ table qui definit les utilisateurs """
     login = db.Column(db.String(200), nullable = False , primary_key = True)
@@ -63,17 +78,43 @@ class user(db.Model):
 
 
 
+######################################################################################################################################################
+#                                                                                                                                                    #
+######################################################################################################################################################
 
+########################################################################################
+#                                                                                      #
+########################################################################################
+def testLogin():
+    if 'username' in session:
+        utilisateurActif = session['username']
+    else:
+        utilisateurActif = "aucun"
+    return utilisateurActif
+
+
+
+######################################################################################################################################################
+#                                                                                                                                                    #
+######################################################################################################################################################
+
+########################################################################################
+#                                                                                      #
+########################################################################################
 @app.route('/',methods=['POST','GET'])
 def login():
-        return render_template('login.html')  
+    utilisateurActif = testLogin()
+    return render_template('login.html',utilisateurActif = utilisateurActif)  
    
-
+########################################################################################
+#                                                                                      #
+########################################################################################
 @app.route('/login',methods=['POST','GET'])
 def validerLogin():
     if request.method == 'POST':
         username = request.form['login']
         password = request.form['mdp']
+
         print(username)
         print(password)
        
@@ -82,33 +123,36 @@ def validerLogin():
         if utilisateurEnBase:
             if check_password_hash(utilisateurEnBase.mdp, password):
                 session['username'] = username
-                
                 return redirect('/pagePrincipale')
             else:
+                flash("mauvais mot de passe")
                 return redirect('/')
         else:
+            flash("utilisateur inconnu")
             return redirect('/')
     else:
-            return redirect('/')
+        return redirect('/')
 
+########################################################################################
+#                                                                                      #
+########################################################################################
 @app.route('/logout',methods=['POST','GET'])
 def logout():
-    if request.method == 'POST':
-
         session.pop('username', None)
         return redirect('/')
-    else:
-            return redirect('/')
+  
 
-
+########################################################################################
+#                                                                                      #
+########################################################################################
 @app.route('/nouveauCompte',methods=['POST','GET'])
 def nouveauCompte():
-    if request.method == 'POST':
-        return render_template('nouveauCompte.html')  
-    else:
-        return redirect('/')
-
-
+    utilisateurActif = testLogin()
+    return render_template('nouveauCompte.html',utilisateurActif = utilisateurActif)  
+    
+########################################################################################
+#                                                                                      #
+########################################################################################
 @app.route('/validerNouveauCompte',methods=['POST','GET'])
 def validerNouveauCompte():
     if request.method == 'POST':
@@ -117,29 +161,38 @@ def validerNouveauCompte():
         print (request.form['mdp'])
         print (request.form['mdp2'])
 
-        loginSaisie = request.form['login']
-        mdpSaisie = request.form['mdp']
-        confirmationMdpSaisie = request.form['mdp2']
+        login = request.form['login']
+        mdp = request.form['mdp']
+        mdp2 = request.form['mdp2']
 
-        if mdpSaisie == confirmationMdpSaisie:
+        utilisateurEnBase = user.query.filter_by(login = login).first()
 
-            new_user = user(login=loginSaisie,mdp = generate_password_hash(mdpSaisie))
-
-            try:
-                db.session.add(new_user)
-                db.session.commit()
-                return redirect('/')
-
-            except:
-                return redirect('/nouveauCompte')
-        else:
+        if utilisateurEnBase:
+            flash("login non disponible")
             return redirect('/nouveauCompte')
+        else:
+            if mdp == mdp2:
+
+                new_user = user(login=login,mdp = generate_password_hash(mdp))
+
+                try:
+                    db.session.add(new_user)
+                    db.session.commit()
+                    flash( "compte créé avec succes")
+                    return redirect('/')
+
+                except:
+                    flash( "probleme dans la création du compte")
+                    return redirect('/nouveauCompte')
+            else:
+                flash( "les mots de passe ne correspondent pas")
+                return redirect('/nouveauCompte')
     else:
         return redirect('/')
 
-
-
-
+########################################################################################
+#                                                                                      #
+########################################################################################
 @app.route('/pagePrincipale',methods=['POST','GET'])
 def pagePrinc():
     if request.method == 'POST':
@@ -155,10 +208,9 @@ def pagePrinc():
         else:
             return redirect('/')
 
-
-
-
-
+########################################################################################
+#                                                                                      #
+########################################################################################
 @app.route('/creationDe',methods=['POST','GET'])
 def creationDe():
     if request.method == 'POST':
@@ -172,8 +224,9 @@ def creationDe():
         else:
             return redirect('/')
 
-
-
+########################################################################################
+#                                                                                      #
+########################################################################################
 @app.route('/valideDe',methods=['POST','GET'])
 def validerDe():
     if request.method == 'POST':
@@ -194,40 +247,25 @@ def validerDe():
         else:
             return redirect('/')
 
-
-
+########################################################################################
+#                                                                                      #
+########################################################################################
 @app.route('/suprimerDe/<int:id>',methods=['POST','GET'])
 def suprimeDe(id):
     dice_to_delete = dice.query.get_or_404(id)
-
+    print(id)
     try:
         db.session.delete(dice_to_delete)
         db.session.commit()
         return redirect('/creationDe')
     except:
-        return 'delete problem'
+        flash("impossible de supprimer ce dé ,verifier qu'il n'appartient pas a un lancé")
+        return redirect('/creationDe')
 
 
-@app.route('/update/<int:id>',methods = ["GET",'POST'])
-def update(id):
-    dice_to_update = dice.query.get_or_404(id)
-
-
-    if request.method == 'POST':
-
-        dice_to_update.name = request.form['nomDuDe']
-        dice_to_update.value = request.form['nbDeFace']
-
-        try:
-            db.session.commit()
-            return redirect('/')
-        except:
-            return 'probleme dans la validation de l update'
-
-    else:
-        return render_template('update.html',dice = dice_to_update)
-
-
+########################################################################################
+#                                                                                      #
+########################################################################################
 @app.route('/lancer/<int:id>',methods=['POST','GET'])
 def lancer(id):
     dice_to_launch = dice.query.get_or_404(id)
@@ -240,7 +278,9 @@ def lancer(id):
 
 
 
-
+########################################################################################
+#                                                                                      #
+########################################################################################
 @app.route('/creationLance',methods=['POST','GET'])
 def creationLance():
     if request.method == 'POST':
@@ -253,7 +293,9 @@ def creationLance():
         else:
             return redirect('/')
 
-
+########################################################################################
+#                                                                                      #
+########################################################################################
 @app.route('/validerLance',methods=['POST','GET'])
 def validerLance():
     if request.method == 'POST':
@@ -271,100 +313,116 @@ def validerLance():
     else:
         return redirect('/')
 
-
-
+########################################################################################
+#                                                                                      #
+########################################################################################
 @app.route('/suprimerLance/<int:id>',methods=['POST','GET'])
 def suprimeLance(id):
     dice_group_to_delete = dice_group.query.get_or_404(id)
-
+    listeJonction = dice_list_group.query.filter(dice_list_group.idGroup == id).all()
     try:
         db.session.delete(dice_group_to_delete)
+        for jonction in listeJonction:
+            db.session.delete(jonction)
         db.session.commit()
         return redirect('/creationLance')
     except:
-        return 'delete problem'
+        flash("problème rencontré pendnat la tentative de suppression")
+        return redirect('/creationLance')
 
-
-
+########################################################################################
+#                                                                                      #
+########################################################################################
 @app.route('/parametrerLance/<int:id>',methods=['POST','GET'])
 def parametrerLance(id):
-    
-    groupeSelectionne = dice_group.query.get_or_404(id)
-    session['idGroupeSelectionne'] = id
-    
-    listeDe = dice.query.filter(dice.owner == session['username']).all()
-    print(listeDe)
-    listeDeGroupe = dice.query.filter(dice.group.any(dice_list_group.idGroup == groupeSelectionne.id)).all()
-    print(dice.query.filter(dice.group.any(dice_list_group.idGroup == groupeSelectionne.id)))
-    print(listeDeGroupe)
+    if request.method == 'POST':
+        groupeSelectionne = dice_group.query.get_or_404(id)
+        session['idGroupeSelectionne'] = id
+        
+        listeDe = dice.query.filter(dice.owner == session['username']).all()
+        
+        # print(listeDe)
+        #listeDeGroupe = dice.query.filter(dice.group.any(dice_list_group.idGroup == groupeSelectionne.id)).all()
+        # print(dice.query.filter(dice.group.any(dice_list_group.idGroup == groupeSelectionne.id)))
+        # print(listeDeGroupe)
 
-    listeJonction = dice_list_group.query.filter(dice_list_group.idGroup == groupeSelectionne.id).all()
-    print(listeJonction)
-    
-    return render_template('parametrageLance.html', listeDe=listeDe , listeDeGroupe=listeDeGroupe , listeJonction=listeJonction , utilisateurActif = session['username'] , groupeSelectionne = groupeSelectionne)
+        listeJonction = dice_list_group.query.filter(dice_list_group.idGroup == groupeSelectionne.id).all()
+        
+        # print(listeJonction)
+    #, listeDeGroupe=listeDeGroupe 
+        return render_template('parametrageLance.html', listeDe=listeDe , listeJonction=listeJonction , utilisateurActif = session['username'] , groupeSelectionne = groupeSelectionne)
+    else:
+        return redirect('/')
 
-
+########################################################################################
+#                                                                                      #
+########################################################################################
 @app.route('/ajouterAuLance/<int:id>',methods=['POST','GET'])
 def ajouterDe(id):
-    dice_to_add = dice.query.get_or_404(id)
-    group_to_add_dice = dice_group.query.get_or_404(session['idGroupeSelectionne'])
+    if request.method == 'POST':
+        dice_to_add = dice.query.get_or_404(id)
+        group_to_add_dice = dice_group.query.get_or_404(session['idGroupeSelectionne'])
 
-    new_dice_list_group = dice_list_group( idDice=dice_to_add.id , idGroup=group_to_add_dice.id )
-    db.session.add(new_dice_list_group)
-   
-    nb_de_de_dans_jonction = dice_list_group.query.filter(dice_list_group.idGroup == group_to_add_dice.id).count()
-    group_to_add_dice.nb_de = nb_de_de_dans_jonction
-    db.session.commit()
-      
-    print(new_dice_list_group)
+        new_dice_list_group = dice_list_group( idDice=dice_to_add.id , idGroup=group_to_add_dice.id )
+        db.session.add(new_dice_list_group)
+    
+        nb_de_de_dans_jonction = dice_list_group.query.filter(dice_list_group.idGroup == group_to_add_dice.id).count()
+        group_to_add_dice.nb_de = nb_de_de_dans_jonction
+        db.session.commit()
+        
+        print(new_dice_list_group)
 
-    return redirect(url_for('parametrerLance', id=session['idGroupeSelectionne']))
+        return redirect(url_for('parametrerLance', id=session['idGroupeSelectionne']),code=307)
+    else:
+        return redirect('/')
 
-
+########################################################################################
+#                                                                                      #
+########################################################################################
 @app.route('/enleverAuLance/<int:id>',methods=['POST','GET'])
 def enleverDe(id):
-    # dice_to_remove = dice.query.get_or_404(id)
-    group_to_remove_dice = dice_group.query.get_or_404(session['idGroupeSelectionne'])
+    if request.method == 'POST':
+        # dice_to_remove = dice.query.get_or_404(id)
+        group_to_remove_dice = dice_group.query.get_or_404(session['idGroupeSelectionne'])
 
-    dice_list_group_to_remove = dice_list_group.query.get_or_404(id)
-    db.session.delete(dice_list_group_to_remove)
+        dice_list_group_to_remove = dice_list_group.query.get_or_404(id)
+        db.session.delete(dice_list_group_to_remove)
 
-    nb_de_de_dans_jonction = dice_list_group.query.filter(dice_list_group.idGroup == group_to_remove_dice.id).count()
-    group_to_remove_dice.nb_de = nb_de_de_dans_jonction
-    db.session.commit()
-      
-    return redirect(url_for('parametrerLance', id=session['idGroupeSelectionne']))
+        nb_de_de_dans_jonction = dice_list_group.query.filter(dice_list_group.idGroup == group_to_remove_dice.id).count()
+        group_to_remove_dice.nb_de = nb_de_de_dans_jonction
+        db.session.commit()
+        
+        return redirect(url_for('parametrerLance', id=session['idGroupeSelectionne']),code=307)
+    else:
+        return redirect('/')
 
-
-
-
-
+########################################################################################
+#                                                                                      #
+########################################################################################
 @app.route('/lancerGroupe/<int:id>',methods=['POST','GET'])
 def lancerGroup(id):
-    # declaration et initialisation de la variable resultat du lancé
-    resultatLance = 0
-    # recuperation du groupe sur lequel effectuer le lancé
-    dice_group_to_launch = dice_group.query.get_or_404(id)
-    # list des jonction du groupe selectionné
-    listeJonction = dice_list_group.query.filter(dice_list_group.idGroup == dice_group_to_launch.id).all()
-   
-   
-   
-    for jonction in listeJonction:
-        print (jonction.id)
-        deSelect = dice.query.filter(dice.id == jonction.idDice).first()
-        print (deSelect.name)
-        dice_result = random.randint (1,deSelect.value)
-        resultatLance += dice_result
-        print('resultat individuel ' + str(dice_result))
-        jonction.last_result = dice_result
+    if request.method == 'POST':
+        # declaration et initialisation de la variable resultat du lancé
+        resultatLance = 0
+        # recuperation du groupe sur lequel effectuer le lancé
+        dice_group_to_launch = dice_group.query.get_or_404(id)
+        # list des jonction du groupe selectionné
+        listeJonction = dice_list_group.query.filter(dice_list_group.idGroup == dice_group_to_launch.id).all()
+    
+        for jonction in listeJonction:
+            print (jonction.id)
+            deSelect = dice.query.filter(dice.id == jonction.idDice).first()
+            print (deSelect.name)
+            dice_result = random.randint (1,deSelect.value)
+            resultatLance += dice_result
+            print('resultat individuel ' + str(dice_result))
+            jonction.last_result = dice_result
+            
         
+        print('resultat total ' + str(resultatLance))
+        dice_group_to_launch.last_result = resultatLance
+        db.session.commit()
 
-
-    
-    print('resultat total ' + str(resultatLance))
-    dice_group_to_launch.last_result = resultatLance
-    db.session.commit()
-
-    
-    return redirect('/pagePrincipale')
+        return redirect('/pagePrincipale')
+    else:
+        return redirect('/')

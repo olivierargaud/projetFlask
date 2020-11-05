@@ -11,61 +11,56 @@
 
 {% block body %}
 
-<h1> création de lancé </h1>
+    <h1> création de lancé </h1>
 
+    <h4>nouveau lancé</h4>
 
-{% if listeLance|length < 1 %}
-<h4 style = "text-align: center;">pas de Lancé créé</h4>
-
-{% else %}
-<h4>liste des lancés disponible</h4>
-<table>
-<tr>
-    <th>Nom du Lancé</th>
-    <th>Nombre de dé dans le lancé</th>
-    <th>dernier lancé</th>
-</tr>
-{% for dice_group in listeLance %}
-        <tr>
-            <td>{{ dice_group.name }}</td>
-            <br>
-            <td>{{ dice_group.nb_de }}</td>
-            <br>
-            <td>{{ dice_group.owner }}</td>
-
-            <td>
-                <form action="/suprimerLance/{{dice_group.id}}" method="POST">
-                    <input type="submit" name = "BpSuprimer" value="SUPPRIMER">
-                </form>
-                <form action="/parametrerLance/{{dice_group.id}}" method="POST">
-                    <input type="submit" name = "BpParametrer" value="PARAMETRER">
-                </form>               
-            </td>
-        </tr>
-    {% endfor %}
-</table>
-{% endif %}
-
-
-
-
-<br>
-<form action="/validerLance" method="POST">
-    <input type="text" name = "nomDuLance" value="" minlength="3" required>  nom du lancé ( min 3 caractères )
     <br>
-    <input type="submit" name = "BpValiderLance" value="VALIDER LANCE">
-</form>
 
-<br>
+    <form action="/validerLance" method="POST">
+        nom du lancé ( min 3 caractères )
+        <br>
+        <input type="text" name = "nomDuLance" value="" minlength="3" required>
+        <br>
+        <input type="submit" name = "BpValiderLance" value="VALIDER LANCE">
+    </form>
+
+    <br>
+
+
+    {% if listeLance|length < 1 %}
+    <h4 style = "text-align: center;">pas de Lancé créé</h4>
+
+    {% else %}
+    <h4>liste des lancés disponible</h4>
+    <table>
+        <tr>
+            <th>Nom du Lancé</th>
+            <th>Nombre de dé dans le lancé</th>
+            <th>proprietaire</th>
+        </tr>
+        {% for dice_group in listeLance %}
+            <tr>
+                <td>{{ dice_group.name }}</td>
+                <br>
+                <td>{{ dice_group.nb_de }}</td>
+                <br>
+                <td>{{ dice_group.owner }}</td>
+
+                <td>
+                    <form action="/suprimerLance/{{dice_group.id}}" method="POST">
+                        <input type="submit" name = "BpSuprimer" value="SUPPRIMER">
+                    </form>
+                    <form action="/parametrerLance/{{dice_group.id}}" method="POST">
+                        <input type="submit" name = "BpParametrer" value="PARAMETRER">
+                    </form>                
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+    {% endif %}
 
 
 
-
-<br>
-<form action="/pagePrincipale" method="POST">
-    <input type="submit" name = "BpRetour" value="RETOUR">
-</form>
-
-<br>
 
 {% endblock %}

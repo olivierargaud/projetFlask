@@ -3,7 +3,7 @@
 
 
 {% block head %}
-  
+   
 {% endblock %}
 
 
@@ -11,99 +11,81 @@
 
 {% block body %}
 
-<h1> parametrage de lancé </h1>
-<h1> nom du groupe : {{groupeSelectionne.name}} </h1>
+    <h1> Parametrage de lancé </h1>
+    <h3>{{groupeSelectionne.name}}</h3>
 
 
-{% if listeDe|length < 1 %}
-<h4>pas de Dé créé</h4>
+    {% if listeDe|length < 1 %}
+    <h4>pas de Dé créé</h4>
 
-{% else %}
-<h4>liste des dés disponible</h4>
-<table>
-    <tr>
-        <th>Nom du dé</th>
-        <th>Nb de face</th>
-    </tr>
- 
-    {% for dice in listeDe %}
+    {% else %}
+    <h4>liste des dés disponible</h4>
+    <table>
         <tr>
-            <td>{{ dice.name }}</td>
-            <td>{{ dice.value }}</td>
-            <td>
-                <form action="/ajouterAuLance/{{dice.id}}" method="POST">
-                    <input type="submit" name = "BpAjouter" value="AJOUTER">
-                </form>  
-            </td>
+            <th>Nom du dé</th>
+            <th>Nb de face</th>
         </tr>
-    {% endfor %}
-</table>
-{% endif %}
-
-
-
-
-
-{% if listeJonction|length < 1 %}
-<h4>pas de jonction</h4>
-
-{% else %}
-<h4>liste des jonction dans ce groupe</h4>
-<table>
-    <tr>
-        <th> id jonction </th>
-        <th> nom dé </th>
-        <th> nombre de face </th>
-    </tr>
-
-    {% for dice_list_group in listeJonction %}
-
-
-        {% if listeDe|length < 1 %}
-        
-        {% else %}
     
-            {% for dice in listeDe %}
+        {% for dice in listeDe %}
+            <tr>
+                <td>{{ dice.name }}</td>
+                <td>{{ dice.value }}</td>
+                <td>
+                    <form action="/ajouterAuLance/{{dice.id}}" method="POST">
+                        <input type="submit" name = "BpAjouter" value="AJOUTER">
+                    </form>  
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+    {% endif %}
 
-                {% if dice.id == dice_list_group.idDice %}
 
-                    <tr>
-                        <td>{{ dice_list_group.id }}</td>
-                        <td>{{ dice.name }}</td>
-                        <td>{{ dice.value }}</td>
-                        <td>
-                            <form action="/enleverAuLance/{{dice_list_group.id}}" method="POST">
-                                <input type="submit" name = "BpEnleverAuLance" value="RETIRER">
-                            </form>    
-                        </td>
-                    </tr>
-                
-                {% endif %}
+
+    {% if listeJonction|length < 1 %}
+    <h4>pas de jonction</h4>
+
+    {% else %}
+    <h4>liste des dés dans ce lancé</h4>
+    <table>
+        <tr>
+            <th> id jonction </th>
+            <th> nom dé </th>
+            <th> nombre de face </th>
+        </tr>
+
+        {% for dice_list_group in listeJonction %}
+
+            {% if listeDe|length < 1 %}
+            
+            {% else %}
         
-            {% endfor %}
+                {% for dice in listeDe %}
 
-        {% endif %}
+                    {% if dice.id == dice_list_group.idDice %}
+
+                        <tr>
+                            <td>{{ dice_list_group.id }}</td>
+                            <td>{{ dice.name }}</td>
+                            <td>{{ dice.value }}</td>
+                            <td>
+                                <form action="/enleverAuLance/{{dice_list_group.id}}" method="POST">
+                                    <input type="submit" name = "BpEnleverAuLance" value="RETIRER">
+                                </form>    
+                            </td>
+                        </tr>
+                    
+                    {% endif %}
+            
+                {% endfor %}
+
+            {% endif %}
         
-    
-    {% endfor %}
+        {% endfor %}
 
 
-</table>
-{% endif %}
+    </table>
+    {% endif %}
 
-
-
-
-
-
-
-
-
-<br>
-<form action="/creationLance" method="POST">
-    <input type="submit" name = "BpRetour" value="RETOUR">
-</form>
-
-<br>
 
 {% endblock %}

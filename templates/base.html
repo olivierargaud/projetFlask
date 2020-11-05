@@ -7,8 +7,11 @@
     <meta http-equiv='X-UA-Compatible' content='IE=edge'>
     <title>Random Dice</title>
     <meta name='viewport' content='width=device-width, initial-scale=1'>
-    <link rel='stylesheet' type='text/css' media='screen' href='static\style.css'>
-    
+    <!-- <link rel='stylesheet' type='text/css' media='screen' href='static\style.css'> -->
+    <link rel='stylesheet' type='text/css' media='screen' href="{{ url_for('static', filename='style.css') }}">
+   
+    <link rel="shortcut icon" type='image/icon' href="static\favicon.ico">
+  
     {% block head %}
     {% endblock %}
    
@@ -17,16 +20,32 @@
 
 
 <body>
-    <h3> utilisateur loggé :{{utilisateurActif}}</h3>
-    <br>
-    <form action="/logout" method="POST">
-        <input type="submit" name = "BpLogout" value="LOGOUT">
-    </form>
-    
+
+    <div class="topnav" id="myTopnav">
+
+        <a href="/pagePrincipale">Page Principale</a>
+        <a href="/creationDe">Création Dé</a>
+        <a href="/creationLance">Création Lancé</a>
+        <a href="/">utilisateur loggé :{{utilisateurActif}}</a>
+        <a href="/logout">Logout</a>
+        
+    </div>
+ 
+
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for msg in messages %}
+                <p>{{msg}}</p>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
     <br>
     {% block body %}
     {% endblock %}
 
+
+    <script type="text/javascript" src="static\script.js"></script>
 </body>
 
    
