@@ -4,4 +4,15 @@
 <h1 class="title">
  Bonjour, {{ name }} !
 </h1>
+<h2>Crée tes dés !</h2>
+<form method="POST" action="/creationDe">
+    <div class="nbr_de_face">
+        <input type="number" name="NbrDeFace" placeholder="Nombre de face" min="1">
+    </div>
+    <button>Créer</button>
+</form>
+<div>
+    <h2>Mes dés</h2>
+    
+</div>
 {% endblock %}

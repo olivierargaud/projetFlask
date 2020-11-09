@@ -6,3 +6,8 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(100), unique=True)
     password = db.Column(db.String(100))
     name = db.Column(db.String(1000))
+
+class Des(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    NbrDeFace = db.Column(db.Integer)
+    Proprietaire = db.Column(db.String(100))
