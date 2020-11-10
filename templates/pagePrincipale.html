@@ -34,6 +34,11 @@
                             <input type="submit" name = "BpLancer" value="LANCER">
                         </form>
                     </td>
+                    <td>
+                        <form action="/historiqueDe/{{dice.id}}" method="POST">
+                            <input type="submit" name = "BpHistDe" value="HISTORIQUE">
+                        </form>
+                    </td>
                 </tr>
             {% endfor %}
     </table>
@@ -67,6 +72,11 @@
                 <td>
                     <form action="/lancerGroupe/{{dice_group.id}}" method="POST">
                         <input type="submit" name = "BpLancer" value="LANCER GROUPE">
+                    </form>
+                </td>
+                <td>
+                    <form action="/historique/{{dice_group.id}}" method="POST">
+                        <input type="submit" name = "BpHistLance" value="HISTORIQUE">
                     </form>
                 </td>
             </tr>

@@ -76,6 +76,34 @@ class user(db.Model):
     def __repr__(self):
         return '<User %r >' % self.login 
 
+########################################################################################
+#                                                                                      #
+########################################################################################
+class historique(db.Model):
+    """ table qui stock l'historique des resultats des dés """
+    id = db.Column(db.Integer, primary_key = True)
+    value = db.Column(db.Integer)
+    deId = db.Column(db.Integer)
+    LanceId = db.Column(db.Integer)
+    date_created = db.Column(db.DateTime, default = datetime.utcnow)
+    
+    def __repr__(self):
+        return '<Hist %r >' % self.value 
+
+########################################################################################
+#                                                                                      #
+########################################################################################
+class historiqueGroup(db.Model):
+    """ table qui stock l'historique des resultats des Lancés"""
+    id = db.Column(db.Integer, primary_key = True)
+    value = db.Column(db.Integer)
+    LanceId = db.Column(db.Integer, ForeignKey('dice_group.id'), nullable = False)
+    idDice = db.Column(db.Integer, ForeignKey('dice.id'), nullable = False)
+    idGroup = db.Column(db.Integer, ForeignKey('dice_group.id'), nullable = False)
+    date_created = db.Column(db.DateTime, default = datetime.utcnow)
+
+    def __repr__(self):
+        return '<HistGroup %r >' % self.value 
 
 
 ######################################################################################################################################################
@@ -269,9 +297,13 @@ def suprimeDe(id):
 @app.route('/lancer/<int:id>',methods=['POST','GET'])
 def lancer(id):
     dice_to_launch = dice.query.get_or_404(id)
+    result = random.randint (1,dice_to_launch.value)
+    dice_to_launch.last_result = result
+    print(result)
 
-    dice_to_launch.last_result = random.randint (1,dice_to_launch.value)
-    print(dice_to_launch.last_result)
+    new_historique = historique(value=result,deId=id)
+    db.session.add(new_historique)
+
     db.session.commit()
     
     return redirect('/pagePrincipale')
@@ -413,10 +445,15 @@ def lancerGroup(id):
             print (jonction.id)
             deSelect = dice.query.filter(dice.id == jonction.idDice).first()
             print (deSelect.name)
-            dice_result = random.randint (1,deSelect.value)
+            result = random.randint (1,deSelect.value)
+            dice_result = result
             resultatLance += dice_result
             print('resultat individuel ' + str(dice_result))
             jonction.last_result = dice_result
+
+            new_historique = historique(value=result,LanceId=id)
+            db.session.add(new_historique)
+
             
         
         print('resultat total ' + str(resultatLance))
@@ -426,3 +463,43 @@ def lancerGroup(id):
         return redirect('/pagePrincipale')
     else:
         return redirect('/')
+
+
+
+
+########################################################################################
+#                                                                                      #
+########################################################################################
+@app.route('/historiqueDe/<int:id>',methods=['POST','GET'])
+def historiqueDe(id):
+    if request.method == 'POST':
+        
+        listeHist = historique.query.filter(historique.deId == id).all()
+        
+        return render_template('historique.html', listeHist=listeHist , utilisateurActif = session['username'] ,id=id)
+    else:
+        return redirect('/')
+      
+ 
+########################################################################################
+#                                                                                      #
+########################################################################################
+@app.route('/suprimerHistoriqueDe/<int:id>',methods=['POST','GET'])
+def supprimerHistoriqueDe(id):
+    if request.method == 'POST':
+        
+        print('toto')
+
+        listeHist = historique.query.filter(historique.deId == id).all()
+
+        for hist in listeHist:
+            db.session.delete(hist)
+        db.session.commit()
+
+        # listeHist = historique.query.filter(historique.deId == id).all()
+
+        return redirect(url_for('historiqueDe', id=id),code=307)
+    else:
+        return redirect('/')
+      
+         
