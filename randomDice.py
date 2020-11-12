@@ -30,8 +30,10 @@ class dice(db.Model):
     owner = db.Column(db.String(50), nullable = False)
     date_created = db.Column(db.DateTime, default = datetime.utcnow)
 
+    # pour que flask prenne en compte le fait que ce sont des clef etrangéres et empêche le delete
     group = db.relationship('dice_list_group', backref=db.backref('dice', lazy='joined'))
-
+    group = db.relationship('historique', backref=db.backref('dice', lazy='joined'))
+    
     def __repr__(self):
         return '<Dé %r , %r faces>' % (self.name , self.value)
 
@@ -94,7 +96,7 @@ class historique(db.Model):
     id = db.Column(db.Integer, primary_key = True)
     value = db.Column(db.Integer)
     de_id = db.Column(db.Integer, ForeignKey('dice.id'), nullable = False)
-    historiqueLance_id = db.Column(db.Integer, ForeignKey('historique_lance.id'))
+    historiqueLance_id = db.Column(db.Integer, ForeignKey('historique_lance.id'), nullable = False)
     date_created = db.Column(db.DateTime, default = datetime.utcnow)
     
     def __repr__(self):
@@ -239,7 +241,7 @@ def validerNouveauCompte():
                     db.session.add(new_user)
                     db.session.commit()
                     flash( "compte créé avec succes")
-                    session['username'] = user.login
+                    session['username'] = new_user.login
                     return redirect('/pagePrincipale')
 
                 except:
@@ -324,7 +326,7 @@ def suprimeDe(id):
         db.session.commit()
         return redirect('/creationDe')
     except:
-        flash("impossible de supprimer ce dé ,verifier qu'il n'appartient pas a un lancé")
+        flash("impossible de supprimer ce dé ,verifier qu'il n'appartient pas a un lancé ou a un historique")
         return redirect('/creationDe')
 
 
@@ -354,8 +356,6 @@ def creationLance():
 def validerLance():
     if request.method == 'POST':
 
-        print (request.form['nomDuLance'])
-     
         new_dice_group = dice_group(name=request.form['nomDuLance'])
         new_dice_group.owner = session['username']
         new_dice_group.nb_de = 0
