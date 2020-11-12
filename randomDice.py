@@ -159,8 +159,12 @@ def testLogin():
 ########################################################################################
 @app.route('/',methods=['POST','GET'])
 def login():
+    page1 = "non_active"
+    page2 = "non_active"
+    page3 = "non_active"
+    page4 = "active"
     utilisateurActif = testLogin()
-    return render_template('login.html',utilisateurActif = utilisateurActif)  
+    return render_template('login.html',utilisateurActif = utilisateurActif,page1=page1,page2=page2,page3=page3,page4=page4)  
    
 ########################################################################################
 #                               commande login                                         #
@@ -203,8 +207,12 @@ def logout():
 ########################################################################################
 @app.route('/nouveauCompte',methods=['POST','GET'])
 def nouveauCompte():
+    page1 = "non_active"
+    page2 = "non_active"
+    page3 = "non_active"
+    page4 = "non_active"
     utilisateurActif = testLogin()
-    return render_template('nouveauCompte.html',utilisateurActif = utilisateurActif)  
+    return render_template('nouveauCompte.html',utilisateurActif = utilisateurActif,page1=page1,page2=page2,page3=page3,page4=page4)  
     
 ########################################################################################
 #                               commande valider nouveau compte                        #
@@ -248,15 +256,19 @@ def validerNouveauCompte():
 ########################################################################################
 @app.route('/pagePrincipale',methods=['POST','GET'])
 def pagePrinc():
+    page1 = "active"
+    page2 = "non_active"
+    page3 = "non_active"
+    page4 = "non_active"
     if request.method == 'POST':
 
         liste_groupe_de = dice_group.query.filter(dice_group.owner == session['username']).all()
-        return render_template('pagePrincipale.html',  liste_groupe_de=liste_groupe_de ,utilisateurActif = session['username'])
+        return render_template('pagePrincipale.html',  liste_groupe_de=liste_groupe_de ,utilisateurActif = session['username'],page1=page1,page2=page2,page3=page3,page4=page4)
     else:
         if 'username' in session:
 
             liste_groupe_de = dice_group.query.filter(dice_group.owner == session['username']).all()
-            return render_template('pagePrincipale.html',  liste_groupe_de=liste_groupe_de ,utilisateurActif = session['username'])
+            return render_template('pagePrincipale.html',  liste_groupe_de=liste_groupe_de ,utilisateurActif = session['username'],page1=page1,page2=page2,page3=page3,page4=page4)
         else:
             return redirect('/')
 
@@ -265,14 +277,18 @@ def pagePrinc():
 ########################################################################################
 @app.route('/creationDe',methods=['POST','GET'])
 def creationDe():
+    page1 = "non_active"
+    page2 = "active"
+    page3 = "non_active"
+    page4 = "non_active"
     if request.method == 'POST':
         listeDe = dice.query.filter(dice.owner == session['username']).all()
-        return render_template('creationDe.html', listeDe=listeDe ,utilisateurActif = session['username'])
+        return render_template('creationDe.html', listeDe=listeDe ,utilisateurActif = session['username'],page1=page1,page2=page2,page3=page3,page4=page4)
     else:
 
         if 'username' in session:
             listeDe = dice.query.filter(dice.owner == session['username']).all()
-            return render_template('creationDe.html', listeDe=listeDe  ,utilisateurActif = session['username'])
+            return render_template('creationDe.html', listeDe=listeDe  ,utilisateurActif = session['username'],page1=page1,page2=page2,page3=page3,page4=page4)
         else:
             return redirect('/')
 
@@ -317,13 +333,17 @@ def suprimeDe(id):
 ########################################################################################
 @app.route('/creationLance',methods=['POST','GET'])
 def creationLance():
+    page1 = "non_active"
+    page2 = "non_active"
+    page3 = "active"
+    page4 = "non_active"
     if request.method == 'POST':
         listeLance = dice_group.query.filter(dice_group.owner == session['username']).all()
-        return render_template('creationLance.html', listeLance=listeLance , utilisateurActif = session['username']) 
+        return render_template('creationLance.html', listeLance=listeLance , utilisateurActif = session['username'],page1=page1,page2=page2,page3=page3,page4=page4) 
     else:
         if 'username' in session:
             listeLance = dice_group.query.filter(dice_group.owner == session['username']).all()
-            return render_template('creationLance.html', listeLance=listeLance , utilisateurActif = session['username'])
+            return render_template('creationLance.html', listeLance=listeLance , utilisateurActif = session['username'],page1=page1,page2=page2,page3=page3,page4=page4)
         else:
             return redirect('/')
 
