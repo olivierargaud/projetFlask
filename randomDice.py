@@ -15,7 +15,7 @@ db = SQLAlchemy(app)
 
 
 ######################################################################################################################################################
-#                                                                                                                                                    #
+#                                                           table base de donnée                                                                     #
 ######################################################################################################################################################
 
 
@@ -102,6 +102,9 @@ class historique(db.Model):
 
 
 
+######################################################################################################################################################
+#                                                           objet pour l'affichage                                                                   #
+######################################################################################################################################################
 
 
 ########################################################################################
@@ -118,7 +121,9 @@ class historique_affichage():
     def __repr__(self):
         return '<Historique numéro %r , %r / %r >' % (self.numero_lance , self.total , self.total_max) 
 
-
+########################################################################################
+#                                                                                      #
+########################################################################################
 class detail_de():
     """ objet qui regroupe les informations detaillé d'un dé a afficher"""
     nom = ''
@@ -129,9 +134,8 @@ class detail_de():
         return '<Historique dé %r , %r / %r >' % (self.nom , self.value , self.face) 
 
 
-
 ######################################################################################################################################################
-#                                                                                                                                                    #
+#                                                           fonction                                                                                 #
 ######################################################################################################################################################
 
 ########################################################################################
@@ -147,11 +151,11 @@ def testLogin():
 
 
 ######################################################################################################################################################
-#                                                                                                                                                    #
+#                                                           route                                                                                    #
 ######################################################################################################################################################
 
 ########################################################################################
-#                                                                                      #
+#                               racine                                                 #
 ########################################################################################
 @app.route('/',methods=['POST','GET'])
 def login():
@@ -159,7 +163,7 @@ def login():
     return render_template('login.html',utilisateurActif = utilisateurActif)  
    
 ########################################################################################
-#                                                                                      #
+#                               commande login                                         #
 ########################################################################################
 @app.route('/login',methods=['POST','GET'])
 def validerLogin():
@@ -186,7 +190,7 @@ def validerLogin():
         return redirect('/')
 
 ########################################################################################
-#                                                                                      #
+#                               commande logout                                        #
 ########################################################################################
 @app.route('/logout',methods=['POST','GET'])
 def logout():
@@ -195,7 +199,7 @@ def logout():
   
 
 ########################################################################################
-#                                                                                      #
+#                               affichage page nouveau compte                          #
 ########################################################################################
 @app.route('/nouveauCompte',methods=['POST','GET'])
 def nouveauCompte():
@@ -203,15 +207,11 @@ def nouveauCompte():
     return render_template('nouveauCompte.html',utilisateurActif = utilisateurActif)  
     
 ########################################################################################
-#                                                                                      #
+#                               commande valider nouveau compte                        #
 ########################################################################################
 @app.route('/validerNouveauCompte',methods=['POST','GET'])
 def validerNouveauCompte():
     if request.method == 'POST':
-
-        print (request.form['login'])
-        print (request.form['mdp'])
-        print (request.form['mdp2'])
 
         login = request.form['login']
         mdp = request.form['mdp']
@@ -244,7 +244,7 @@ def validerNouveauCompte():
         return redirect('/')
 
 ########################################################################################
-#                                                                                      #
+#                               affichage page principale                              #
 ########################################################################################
 @app.route('/pagePrincipale',methods=['POST','GET'])
 def pagePrinc():
@@ -261,7 +261,7 @@ def pagePrinc():
             return redirect('/')
 
 ########################################################################################
-#                                                                                      #
+#                               affichage page création dé                             #
 ########################################################################################
 @app.route('/creationDe',methods=['POST','GET'])
 def creationDe():
@@ -277,15 +277,12 @@ def creationDe():
             return redirect('/')
 
 ########################################################################################
-#                                                                                      #
+#                               commande valider dé                                    #
 ########################################################################################
 @app.route('/valideDe',methods=['POST','GET'])
 def validerDe():
     if request.method == 'POST':
 
-        print (request.form['nomDuDe'])
-        print (request.form['nbDeFace'])
-       
         new_dice = dice(name=request.form['nomDuDe'],value = request.form['nbDeFace'])
         new_dice.owner = session['username']
 
@@ -300,7 +297,7 @@ def validerDe():
             return redirect('/')
 
 ########################################################################################
-#                                                                                      #
+#                               commande supprimer dé                                  #
 ########################################################################################
 @app.route('/suprimerDe/<int:id>',methods=['POST','GET'])
 def suprimeDe(id):
@@ -316,26 +313,7 @@ def suprimeDe(id):
 
 
 ########################################################################################
-#                                                                                      #
-########################################################################################
-# @app.route('/lancer/<int:id>',methods=['POST','GET'])
-# def lancer(id):
-#     dice_to_launch = dice.query.get_or_404(id)
-#     result = random.randint (1,dice_to_launch.value)
-#     dice_to_launch.last_result = result
-#     print(result)
-
-#     new_historique = historique(value=result,deId=id)
-#     db.session.add(new_historique)
-
-#     db.session.commit()
-    
-#     return redirect('/pagePrincipale')
-
-
-
-########################################################################################
-#                                                                                      #
+#                               affichage page création de lancé                       #
 ########################################################################################
 @app.route('/creationLance',methods=['POST','GET'])
 def creationLance():
@@ -350,7 +328,7 @@ def creationLance():
             return redirect('/')
 
 ########################################################################################
-#                                                                                      #
+#                               commande valider nouveau lancé                         #
 ########################################################################################
 @app.route('/validerLance',methods=['POST','GET'])
 def validerLance():
@@ -370,7 +348,7 @@ def validerLance():
         return redirect('/')
 
 ########################################################################################
-#                                                                                      #
+#                               commande supprimer lancé                               #
 ########################################################################################
 @app.route('/suprimerLance/<int:id>',methods=['POST','GET'])
 def suprimeLance(id):
@@ -387,7 +365,7 @@ def suprimeLance(id):
         return redirect('/creationLance')
 
 ########################################################################################
-#                                                                                      #
+#                               affichage page parametrage de lancé                    #
 ########################################################################################
 @app.route('/parametrerLance/<int:id>',methods=['POST','GET'])
 def parametrerLance(id):
@@ -397,21 +375,14 @@ def parametrerLance(id):
         
         listeDe = dice.query.filter(dice.owner == session['username']).all()
         
-        # print(listeDe)
-        #listeDeGroupe = dice.query.filter(dice.group.any(dice_list_group.idGroup == groupeSelectionne.id)).all()
-        # print(dice.query.filter(dice.group.any(dice_list_group.idGroup == groupeSelectionne.id)))
-        # print(listeDeGroupe)
-
         listeJonction = dice_list_group.query.filter(dice_list_group.idGroup == groupeSelectionne.id).all()
         
-        # print(listeJonction)
-    #, listeDeGroupe=listeDeGroupe 
         return render_template('parametrageLance.html', listeDe=listeDe , listeJonction=listeJonction , utilisateurActif = session['username'] , groupeSelectionne = groupeSelectionne)
     else:
         return redirect('/')
 
 ########################################################################################
-#                                                                                      #
+#                               commande ajouter un dé au lancé                        #
 ########################################################################################
 @app.route('/ajouterAuLance/<int:id>',methods=['POST','GET'])
 def ajouterDe(id):
@@ -433,7 +404,7 @@ def ajouterDe(id):
         return redirect('/')
 
 ########################################################################################
-#                                                                                      #
+#                               commande enlever un dé au lancé                        #
 ########################################################################################
 @app.route('/enleverAuLance/<int:id>',methods=['POST','GET'])
 def enleverDe(id):
@@ -453,7 +424,7 @@ def enleverDe(id):
         return redirect('/')
 
 ########################################################################################
-#                                                                                      #
+#                               commande lancer un groupe de dé                        #
 ########################################################################################
 @app.route('/lancerGroupe/<int:id>',methods=['POST','GET'])
 def lancerGroup(id):
@@ -500,7 +471,7 @@ def lancerGroup(id):
 
 
 ########################################################################################
-#                                                                                      #
+#                               affichage page historique du groupe                    #
 ########################################################################################
 @app.route('/historique/<int:id>',methods=['POST','GET'])
 def historiqueAff(id):
@@ -528,7 +499,7 @@ def historiqueAff(id):
 
             # liste des historique de dé lié a cet historique lancé
             liste_hist_de = historique.query.filter(historique.historiqueLance_id == hist.id).all()
-
+            # pour chaque éléments historique dé on crée un objet detail_de que l'on ajoute a la liste de detail
             for hist_de in liste_hist_de:
 
                 detail = detail_de()
@@ -540,51 +511,34 @@ def historiqueAff(id):
                 hist_aff.total += detail.value
                 hist_aff.total_max += detail.face
                 hist_aff.liste_detail.append(detail)
-           
-            print('toto')
-            print(hist_aff.liste_detail)
-           
+                 
             liste_hist_aff.append(hist_aff)
-            
-        
-        print(liste_hist_aff)
-
+  
         return render_template('historique.html', liste_hist_aff=liste_hist_aff , utilisateurActif = session['username'] ,id=id,nom_lance=nom_lance)
     else:
         return redirect('/')
       
  
 ########################################################################################
-#                                                                                      #
+#                               commande supprimer l'historique d'un groupe de dé      #
 ########################################################################################
 @app.route('/suprimerHistoriqueDe/<int:id>',methods=['POST','GET'])
 def supprimerHistoriqueDe(id):
     if request.method == 'POST':
         
-        print('toto')
         listHistoriqueLanceToDelete = historique_lance.query.filter(historique_lance.lance_id == id).all()
 
         for histLance in listHistoriqueLanceToDelete:
 
             listeHist = historique.query.filter(historique.historiqueLance_id == histLance.id).all()
 
-            print(histLance)
-
             for hist in listeHist:
-                print(hist)
+
                 db.session.delete(hist)
 
             db.session.delete(histLance)
     
         db.session.commit()
-
-
-        hist_aff = historique_affichage()
-        hist_aff.numero_lance= 8
-        hist_aff.total=20
-        hist_aff.total_max=30
-
-        print(hist_aff)
 
         return redirect(url_for('historiqueAff', id=id),code=307)
     else:

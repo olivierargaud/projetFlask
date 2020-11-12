@@ -34,19 +34,17 @@
     {% else %}
     <h4>liste des lancés disponible</h4>
     <table>
-        <tr>
+        <tr class="titre">
             <th>Nom du Lancé</th>
             <th>Nombre de dé dans le lancé</th>
             <th>proprietaire</th>
+            <th></th>
         </tr>
         {% for dice_group in listeLance %}
             <tr>
-                <td>{{ dice_group.name }}</td>
-                <br>
-                <td>{{ dice_group.nb_de }}</td>
-                <br>
+                <td>{{ dice_group.name }}</td>                
+                <td>{{ dice_group.nb_de }}</td>                
                 <td>{{ dice_group.owner }}</td>
-
                 <td>
                     <form action="/suprimerLance/{{dice_group.id}}" method="POST">
                         <input type="submit" name = "BpSuprimer" value="SUPPRIMER">
