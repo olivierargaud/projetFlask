@@ -44,17 +44,38 @@ form
 
 table
 {
-
     margin-left: auto;
     margin-right: auto;
     text-align: center;
     text-size-adjust: 30;
     color: #f2f2f2;
-    background-color: #333;
+    background-color: #666;
     /* background-color:slateblue; */
 }
 
 
+table, th, td 
+{
+    border: 1px solid red;
+    border-collapse: collapse;
+}
+
+th, td 
+{
+    padding: 5px;
+    text-align: left;    
+}
+
+.titre
+{
+    background-color: #333;
+}
+
+.soustable
+{
+    padding: 0px;
+    align-items: flex-start;
+}
 
 /* Add a black background color to the top navigation */
 .topnav 

@@ -27,14 +27,13 @@ class dice(db.Model):
     id = db.Column(db.Integer, primary_key = True)
     name = db.Column(db.String(200), nullable = False)
     value = db.Column(db.Integer, nullable = False)
-    last_result = db.Column(db.Integer)
     owner = db.Column(db.String(50), nullable = False)
     date_created = db.Column(db.DateTime, default = datetime.utcnow)
 
     group = db.relationship('dice_list_group', backref=db.backref('dice', lazy='joined'))
 
     def __repr__(self):
-        return '<Dé %r %r>' % (self.name , self.value)
+        return '<Dé %r , %r faces>' % (self.name , self.value)
 
 ########################################################################################
 #                                                                                      #
@@ -49,7 +48,7 @@ class dice_group(db.Model):
     date_created = db.Column(db.DateTime, default = datetime.utcnow)
 
     def __repr__(self):
-        return '<groupe %r>' % (self.name)
+        return '<Lancé %r , %r dé(s)>' % (self.name,self.nb_de)
 
 ########################################################################################
 #                                                                                      #
@@ -59,7 +58,6 @@ class dice_list_group(db.Model):
     id = db.Column(db.Integer, primary_key = True)
     idDice = db.Column(db.Integer, ForeignKey('dice.id'), nullable = False)
     idGroup = db.Column(db.Integer, ForeignKey('dice_group.id'), nullable = False)
-    last_result = db.Column(db.Integer)
     
     def __repr__(self):
         return '<idDice %r idGroup %r>' % (self.idDice , self.idGroup)
@@ -79,31 +77,57 @@ class user(db.Model):
 ########################################################################################
 #                                                                                      #
 ########################################################################################
-class historique(db.Model):
-    """ table qui stock l'historique des resultats des dés """
+class historique_lance(db.Model):
+    """ table qui stock l'historique des resultats des Lancés """
     id = db.Column(db.Integer, primary_key = True)
-    value = db.Column(db.Integer)
-    deId = db.Column(db.Integer)
-    LanceId = db.Column(db.Integer)
+    lance_id = db.Column(db.Integer, ForeignKey('dice_group.id'), nullable = False)
     date_created = db.Column(db.DateTime, default = datetime.utcnow)
     
     def __repr__(self):
-        return '<Hist %r >' % self.value 
+        return '<Historique db lancé %r >' % self.id 
 
 ########################################################################################
 #                                                                                      #
 ########################################################################################
-class historiqueGroup(db.Model):
-    """ table qui stock l'historique des resultats des Lancés"""
+class historique(db.Model):
+    """ table qui stock l'historique des resultats des dés """
     id = db.Column(db.Integer, primary_key = True)
     value = db.Column(db.Integer)
-    LanceId = db.Column(db.Integer, ForeignKey('dice_group.id'), nullable = False)
-    idDice = db.Column(db.Integer, ForeignKey('dice.id'), nullable = False)
-    idGroup = db.Column(db.Integer, ForeignKey('dice_group.id'), nullable = False)
+    de_id = db.Column(db.Integer, ForeignKey('dice.id'), nullable = False)
+    historiqueLance_id = db.Column(db.Integer, ForeignKey('historique_lance.id'))
     date_created = db.Column(db.DateTime, default = datetime.utcnow)
+    
+    def __repr__(self):
+        return '<Historique db de id %r >' % self.id 
+
+
+
+
+
+########################################################################################
+#                                                                                      #
+########################################################################################
+class historique_affichage():
+    """ objet qui regroupe les informations a afficher """
+    numero_lance = 0
+    total_max = 0
+    total = 0
+    date_created = ''
+    liste_detail = []
 
     def __repr__(self):
-        return '<HistGroup %r >' % self.value 
+        return '<Historique numéro %r , %r / %r >' % (self.numero_lance , self.total , self.total_max) 
+
+
+class detail_de():
+    """ objet qui regroupe les informations detaillé d'un dé a afficher"""
+    nom = ''
+    face = 0
+    value = 0
+    
+    def __repr__(self):
+        return '<Historique dé %r , %r / %r >' % (self.nom , self.value , self.face) 
+
 
 
 ######################################################################################################################################################
@@ -207,7 +231,8 @@ def validerNouveauCompte():
                     db.session.add(new_user)
                     db.session.commit()
                     flash( "compte créé avec succes")
-                    return redirect('/')
+                    session['username'] = user.login
+                    return redirect('/pagePrincipale')
 
                 except:
                     flash( "probleme dans la création du compte")
@@ -225,14 +250,13 @@ def validerNouveauCompte():
 def pagePrinc():
     if request.method == 'POST':
 
-        listeDe = dice.query.filter(dice.owner == session['username']).all()
-        listeLance = dice_group.query.filter(dice_group.owner == session['username']).all()
-        return render_template('pagePrincipale.html', listeDe=listeDe , listeLance=listeLance ,utilisateurActif = session['username'])
+        liste_groupe_de = dice_group.query.filter(dice_group.owner == session['username']).all()
+        return render_template('pagePrincipale.html',  liste_groupe_de=liste_groupe_de ,utilisateurActif = session['username'])
     else:
         if 'username' in session:
-            listeDe = dice.query.filter(dice.owner == session['username']).all()
-            listeLance = dice_group.query.filter(dice_group.owner == session['username']).all()
-            return render_template('pagePrincipale.html', listeDe=listeDe , listeLance=listeLance ,utilisateurActif = session['username'])
+
+            liste_groupe_de = dice_group.query.filter(dice_group.owner == session['username']).all()
+            return render_template('pagePrincipale.html',  liste_groupe_de=liste_groupe_de ,utilisateurActif = session['username'])
         else:
             return redirect('/')
 
@@ -294,19 +318,19 @@ def suprimeDe(id):
 ########################################################################################
 #                                                                                      #
 ########################################################################################
-@app.route('/lancer/<int:id>',methods=['POST','GET'])
-def lancer(id):
-    dice_to_launch = dice.query.get_or_404(id)
-    result = random.randint (1,dice_to_launch.value)
-    dice_to_launch.last_result = result
-    print(result)
+# @app.route('/lancer/<int:id>',methods=['POST','GET'])
+# def lancer(id):
+#     dice_to_launch = dice.query.get_or_404(id)
+#     result = random.randint (1,dice_to_launch.value)
+#     dice_to_launch.last_result = result
+#     print(result)
 
-    new_historique = historique(value=result,deId=id)
-    db.session.add(new_historique)
+#     new_historique = historique(value=result,deId=id)
+#     db.session.add(new_historique)
 
-    db.session.commit()
+#     db.session.commit()
     
-    return redirect('/pagePrincipale')
+#     return redirect('/pagePrincipale')
 
 
 
@@ -441,6 +465,10 @@ def lancerGroup(id):
         # list des jonction du groupe selectionné
         listeJonction = dice_list_group.query.filter(dice_list_group.idGroup == dice_group_to_launch.id).all()
     
+        new_historique_lance = historique_lance(lance_id = id)
+        db.session.add(new_historique_lance)
+
+
         for jonction in listeJonction:
             print (jonction.id)
             deSelect = dice.query.filter(dice.id == jonction.idDice).first()
@@ -451,13 +479,17 @@ def lancerGroup(id):
             print('resultat individuel ' + str(dice_result))
             jonction.last_result = dice_result
 
-            new_historique = historique(value=result,LanceId=id)
+            new_historique = historique( value = result , historiqueLance_id = new_historique_lance.id , de_id = deSelect.id)
             db.session.add(new_historique)
 
             
         
         print('resultat total ' + str(resultatLance))
         dice_group_to_launch.last_result = resultatLance
+
+        new_historique_lance.valeur_total = resultatLance
+        print('id du historiquelance')
+        print(new_historique_lance.id)
         db.session.commit()
 
         return redirect('/pagePrincipale')
@@ -470,13 +502,54 @@ def lancerGroup(id):
 ########################################################################################
 #                                                                                      #
 ########################################################################################
-@app.route('/historiqueDe/<int:id>',methods=['POST','GET'])
-def historiqueDe(id):
+@app.route('/historique/<int:id>',methods=['POST','GET'])
+def historiqueAff(id):
     if request.method == 'POST':
         
-        listeHist = historique.query.filter(historique.deId == id).all()
+        nom_lance = dice_group.query.filter(dice_group.id == id).first().name
+
+        # on recupere la liste des historiques liés a ce lancé
+        listeHist = historique_lance.query.filter(historique_lance.lance_id == id).all()
+        # on initialise un liste vide d'historique a afficher
+        liste_hist_aff = []
+       
+        # pour chaque éléments dans la liste d'historique on crée un objet pour l'affichage  
+        for hist in listeHist:
+            hist_aff = historique_affichage()
+
+            hist_aff.numero_lance = hist.id
+            hist_aff.total = 0
+            hist_aff.total_max =0
+            hist_aff.liste_detail= []
+            hist_aff.date_created = 'date : '+str(hist.date_created.date())\
+                                    +' heure : '+str(hist.date_created.hour)\
+                                    +':'+str(hist.date_created.minute)\
+                                    +':'+str(hist.date_created.second)
+
+            # liste des historique de dé lié a cet historique lancé
+            liste_hist_de = historique.query.filter(historique.historiqueLance_id == hist.id).all()
+
+            for hist_de in liste_hist_de:
+
+                detail = detail_de()
+
+                detail.nom = dice.query.filter(dice.id == hist_de.de_id).first().name
+                detail.face = dice.query.filter(dice.id == hist_de.de_id).first().value
+                detail.value = hist_de.value
+
+                hist_aff.total += detail.value
+                hist_aff.total_max += detail.face
+                hist_aff.liste_detail.append(detail)
+           
+            print('toto')
+            print(hist_aff.liste_detail)
+           
+            liste_hist_aff.append(hist_aff)
+            
         
-        return render_template('historique.html', listeHist=listeHist , utilisateurActif = session['username'] ,id=id)
+        print(liste_hist_aff)
+
+        return render_template('historique.html', liste_hist_aff=liste_hist_aff , utilisateurActif = session['username'] ,id=id,nom_lance=nom_lance)
     else:
         return redirect('/')
       
@@ -489,16 +562,31 @@ def supprimerHistoriqueDe(id):
     if request.method == 'POST':
         
         print('toto')
+        listHistoriqueLanceToDelete = historique_lance.query.filter(historique_lance.lance_id == id).all()
 
-        listeHist = historique.query.filter(historique.deId == id).all()
+        for histLance in listHistoriqueLanceToDelete:
 
-        for hist in listeHist:
-            db.session.delete(hist)
+            listeHist = historique.query.filter(historique.historiqueLance_id == histLance.id).all()
+
+            print(histLance)
+
+            for hist in listeHist:
+                print(hist)
+                db.session.delete(hist)
+
+            db.session.delete(histLance)
+    
         db.session.commit()
 
-        # listeHist = historique.query.filter(historique.deId == id).all()
 
-        return redirect(url_for('historiqueDe', id=id),code=307)
+        hist_aff = historique_affichage()
+        hist_aff.numero_lance= 8
+        hist_aff.total=20
+        hist_aff.total_max=30
+
+        print(hist_aff)
+
+        return redirect(url_for('historiqueAff', id=id),code=307)
     else:
         return redirect('/')
       

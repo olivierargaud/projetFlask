@@ -34,17 +34,15 @@
 
     {% else %}
         <table>
-            <tr>
+            <tr class="titre">
                 <th>Nom du dé</th>
                 <th>Nb de face</th>
-                <th>dernier lancé</th>
+                <th></th>
             </tr>
             {% for dice in listeDe %}
                 <tr>
                     <td>{{ dice.name }}</td>
                     <td>{{ dice.value }}</td>
-                    <br>
-                    <td>{{ dice.last_result }}</td>
                     <td>
                         <form action="/suprimerDe/{{dice.id}}" method="POST">
                             <input type="submit" name = "BpSuprimer" value="SUPPRIMER">

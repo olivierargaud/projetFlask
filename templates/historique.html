@@ -11,35 +11,70 @@
 
 {% block body %}
 
-    <h1> historique </h1>
+    <h1> historique  {{nom_lance}}</h1>
     
-    {% if listeHist|length < 1 %}
+    {% if liste_hist_aff|length < 1 %}
     <h4>pas d'historique</h4>
 
     {% else %}
     <table>
-        <tr>
-            <th>idHist</th>
-            <th>deId</th>
-            <th>LanceId</th>
-            <th>value</th>
+        <tr class="titre">
+            <th>n°</th>
+            <th>total</th>
+            <th>detail</th>
             <th>timestamp</th>
         </tr>
     
-        {% for historique in listeHist %}
+        {% for historique in liste_hist_aff %}
             <tr>
-                <td>{{ historique.id }}</td>
-                <td>{{ historique.deId }}</td>
-                <td>{{ historique.LanceId }}</td>
-                <td>{{ historique.value }}</td>
+                <td>{{ historique.numero_lance }}</td>
+                <td class="soustable">
+                    <table>
+                        <tr class="titre">
+                            <th>result</th>
+                            <th>max</th>        
+                        </tr>
+                        <tr>
+                            <td>{{historique.total}}</td>
+                            <td>{{historique.total_max}}</td>        
+                        </tr>
+                    </table>
+                </td>
+                <td>
+                    {% if liste_hist_aff|length < 1 %}
+                    <h4>pas d'historique</h4>
+
+                    {% else %}
+                   
+                    <table>
+                        <tr class="titre">
+                            <th>nom</th>
+                            <th>result</th>
+                            <th>max</th>        
+                        </tr>
+                        {% for detail_de in historique.liste_detail %}
+                        <tr>
+                            <td>{{detail_de.nom}}</td>
+                            <td>{{detail_de.value}}</td>
+                            <td>{{detail_de.face}}</td>        
+                        </tr>
+                        {% endfor %}
+                    </table>
+                    {% endif %}
+                </td>
                 <td>{{ historique.date_created }}</td>
             </tr>
         {% endfor %}
     </table>
-
+    <br>
+    <br>
+    <br>
     <form action="/suprimerHistoriqueDe/{{id}}" method="POST">
         <input type="submit" name = "BpSuprHistDe" value="SUPPRIMER HISTORIQUE">
     </form>
+    <br>
+    <br>
+    <br>
 
     {% endif %}
 
