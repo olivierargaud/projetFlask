@@ -11,3 +11,6 @@ class Des(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     NbrDeFace = db.Column(db.Integer)
     Proprietaire = db.Column(db.String(100))
+    NomProprietaire = db.Column(db.String(100))
+    NomDuDes = db.Column(db.String(100))
+    LastResult = db.Column(db.Integer, nullable=False)

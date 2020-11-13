@@ -5,14 +5,35 @@
  Bonjour, {{ name }} !
 </h1>
 <h2>Crée tes dés !</h2>
-<form method="POST" action="/creationDe">
+<form method="POST" action="/newDice">
     <div class="nbr_de_face">
-        <input type="number" name="NbrDeFace" placeholder="Nombre de face" min="1">
+        <input type="number" name="NumberOfFaces" placeholder="Nombre de face" min="1">
+        <input type="text" name="DiceName" placeholder="Nom du dés">
     </div>
     <button>Créer</button>
 </form>
 <div>
     <h2>Mes dés</h2>
-    
+    <div>
+        {% for dice in dice_user: %}
+            <ul>
+                <li>
+                    {{dice.NomDuDes}} : Dés à {{dice.NbrDeFace}} faces 
+                    <div class="delete">
+                        <form method="POST" action="/deleteDice">
+                            <input style="display: none;" type="text" name="getIdDiceToDelete" value={{dice.id}}>
+                            <button>Supprimer</button>
+                        </form>
+                    </div>
+                    <div class="random">
+                        <form method="POST" action="/randomDice">
+                            <input style="display: none;" type="text" name="getNumberForRandom" value={{dice.id}}>
+                            <button>Lancer</button>{{dice.LastResult}}
+                        </form>
+                    </div>
+                </li>
+            </ul>
+        {% endfor %}
+    </div>
 </div>
 {% endblock %}
