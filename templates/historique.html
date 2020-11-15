@@ -13,7 +13,7 @@
 
     <h1> historique  {{nom_lance}}</h1>
     
-    {% if liste_hist_aff|length < 1 %}
+    {% if roll_historic_list_to_show|length < 1 %}
     <h4>pas d'historique</h4>
 
     {% else %}
@@ -25,7 +25,7 @@
             <th>timestamp</th>
         </tr>
     
-        {% for historique in liste_hist_aff %}
+        {% for historique in roll_historic_list_to_show %}
             <tr>
                 <td>{{ historique.numero_lance }}</td>
                 <td class="soustable">
@@ -41,7 +41,7 @@
                     </table>
                 </td>
                 <td>
-                    {% if liste_hist_aff|length < 1 %}
+                    {% if roll_historic_list_to_show|length < 1 %}
                     <h4>pas d'historique</h4>
 
                     {% else %}
@@ -52,11 +52,11 @@
                             <th>result</th>
                             <th>max</th>        
                         </tr>
-                        {% for detail_de in historique.liste_detail %}
+                        {% for dice_detail in historique.detail_list %}
                         <tr>
-                            <td>{{detail_de.nom}}</td>
-                            <td>{{detail_de.value}}</td>
-                            <td>{{detail_de.face}}</td>        
+                            <td>{{dice_detail.name}}</td>
+                            <td>{{dice_detail.value}}</td>
+                            <td>{{dice_detail.face}}</td>        
                         </tr>
                         {% endfor %}
                     </table>
@@ -69,7 +69,7 @@
     <br>
     <br>
     <br>
-    <form action="/suprimerHistoriqueDe/{{id}}" method="POST">
+    <form action="/deleteHistoric/{{id}}" method="POST">
         <input type="submit" name = "BpSuprHistDe" value="SUPPRIMER HISTORIQUE">
     </form>
     <br>

@@ -17,7 +17,7 @@
 
     <br>
 
-    <form action="/validerLance" method="POST">
+    <form action="/createGroup" method="POST">
         nom du lancé ( min 3 caractères )
         <br>
         <input type="text" name = "nomDuLance" value="" minlength="3" required>
@@ -28,7 +28,7 @@
     <br>
 
 
-    {% if listeLance|length < 1 %}
+    {% if group_list|length < 1 %}
     <h4 style = "text-align: center;">pas de Lancé créé</h4>
 
     {% else %}
@@ -37,19 +37,17 @@
         <tr class="titre">
             <th>Nom du Lancé</th>
             <th>Nombre de dé dans le lancé</th>
-            <th>proprietaire</th>
             <th></th>
         </tr>
-        {% for dice_group in listeLance %}
+        {% for dice_group in group_list %}
             <tr>
                 <td>{{ dice_group.name }}</td>                
-                <td>{{ dice_group.nb_de }}</td>                
-                <td>{{ dice_group.owner }}</td>
+                <td>{{ dice_group.dice_count }}</td>                
                 <td>
-                    <form action="/suprimerLance/{{dice_group.id}}" method="POST">
+                    <form action="/deleteGroup/{{dice_group.group_id}}" method="POST">
                         <input type="submit" name = "BpSuprimer" value="SUPPRIMER">
                     </form>
-                    <form action="/parametrerLance/{{dice_group.id}}" method="POST">
+                    <form action="/parametrerLance/{{dice_group.group_id}}" method="POST">
                         <input type="submit" name = "BpParametrer" value="PARAMETRER">
                     </form>                
                 </td>

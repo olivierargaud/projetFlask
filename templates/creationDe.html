@@ -14,7 +14,7 @@
     <h1> création dé </h1>
     <h4>nouveau dé</h4>
     <br>
-    <form action="/valideDe" method="POST">
+    <form action="/createDice" method="POST">
         nom du dé ( min 3 caractères )
         <br>
         <input type="text" name = "nomDuDe" value="" minlength="3" required> 
@@ -29,7 +29,7 @@
 
     <br>
 
-    {% if listeDe|length < 1 %}
+    {% if dice_list|length < 1 %}
     <h4 style = "text-align: center;">pas de Dé créé</h4>
 
     {% else %}
@@ -39,12 +39,12 @@
                 <th>Nb de face</th>
                 <th></th>
             </tr>
-            {% for dice in listeDe %}
+            {% for dice in dice_list %}
                 <tr>
                     <td>{{ dice.name }}</td>
                     <td>{{ dice.value }}</td>
                     <td>
-                        <form action="/suprimerDe/{{dice.id}}" method="POST">
+                        <form action="/deleteDice/{{dice.dice_id}}" method="POST">
                             <input type="submit" name = "BpSuprimer" value="SUPPRIMER">
                         </form>
                     </td>

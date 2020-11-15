@@ -23,121 +23,111 @@ db = SQLAlchemy(app)
 #                                                                                      #
 ########################################################################################
 class dice(db.Model):
-    """ table qui definit les dés """
-    id = db.Column(db.Integer, primary_key = True)
+    dice_id = db.Column(db.Integer, primary_key = True)
     name = db.Column(db.String(200), nullable = False)
     value = db.Column(db.Integer, nullable = False)
     owner = db.Column(db.String(50), nullable = False)
     date_created = db.Column(db.DateTime, default = datetime.utcnow)
 
-    # pour que flask prenne en compte le fait que ce sont des clef etrangéres et empêche le delete
-    group = db.relationship('dice_list_group', backref=db.backref('dice', lazy='joined'))
-    group = db.relationship('historique', backref=db.backref('dice', lazy='joined'))
+    group = db.relationship('junction_dice_group', backref=db.backref('dice', lazy='joined'))
+    group = db.relationship('dice_historic', backref=db.backref('dice', lazy='joined'))
     
     def __repr__(self):
-        return '<Dé %r , %r faces>' % (self.name , self.value)
+        return '<Dice %r , %r faces>' % (self.name , self.value)
 
 ########################################################################################
 #                                                                                      #
 ########################################################################################
 class dice_group(db.Model):
-    """ table qui definit les groupes de dés (lancer plusieurs dés) """
-    id = db.Column(db.Integer, primary_key = True)
+    group_id = db.Column(db.Integer, primary_key = True)
     name = db.Column(db.String(200), nullable = False)
     owner = db.Column(db.String(50), nullable = False)
     last_result = db.Column(db.Integer)
-    nb_de = db.Column(db.Integer)
+    dice_count = db.Column(db.Integer)
     date_created = db.Column(db.DateTime, default = datetime.utcnow)
 
     def __repr__(self):
-        return '<Lancé %r , %r dé(s)>' % (self.name,self.nb_de)
+        return '<Dice Group %r , %r dice>' % (self.name,self.nb_de)
 
 ########################################################################################
 #                                                                                      #
 ########################################################################################
-class dice_list_group(db.Model):
-    """ table de liaison entre les dés et les groupes de dés """
-    id = db.Column(db.Integer, primary_key = True)
-    idDice = db.Column(db.Integer, ForeignKey('dice.id'), nullable = False)
-    idGroup = db.Column(db.Integer, ForeignKey('dice_group.id'), nullable = False)
+class junction_dice_group(db.Model):
+    junction_dice_group_id = db.Column(db.Integer, primary_key = True)
+    dice_id = db.Column(db.Integer, ForeignKey('dice.dice_id'), nullable = False)
+    group_id = db.Column(db.Integer, ForeignKey('dice_group.group_id'), nullable = False)
     
     def __repr__(self):
-        return '<idDice %r idGroup %r>' % (self.idDice , self.idGroup)
+        return '<Dice %r Group %r>' % (self.dice_id , self.group_id)
 
 ########################################################################################
 #                                                                                      #
 ########################################################################################
 class user(db.Model):
-    """ table qui definit les utilisateurs """
     login = db.Column(db.String(200), nullable = False , primary_key = True)
-    mdp = db.Column(db.String(200), nullable = False)
-    date_created = db.Column(db.DateTime, default = datetime.utcnow)
-
+    password = db.Column(db.String(200), nullable = False)
+    
     def __repr__(self):
-        return '<User %r >' % self.login 
+        return '<User %r >' % self.password 
 
 ########################################################################################
 #                                                                                      #
 ########################################################################################
-class historique_lance(db.Model):
-    """ table qui stock l'historique des resultats des Lancés """
-    id = db.Column(db.Integer, primary_key = True)
-    lance_id = db.Column(db.Integer, ForeignKey('dice_group.id'), nullable = False)
+class roll_historic(db.Model):
+    roll_historic_id = db.Column(db.Integer, primary_key = True)
+    dice_group_id = db.Column(db.Integer, ForeignKey('dice_group.group_id'), nullable = False)
     date_created = db.Column(db.DateTime, default = datetime.utcnow)
     
     def __repr__(self):
-        return '<Historique db lancé %r >' % self.id 
+        return '<historic roll nb %r >' % self.roll_historic_id 
 
 ########################################################################################
 #                                                                                      #
 ########################################################################################
-class historique(db.Model):
-    """ table qui stock l'historique des resultats des dés """
-    id = db.Column(db.Integer, primary_key = True)
+class dice_historic(db.Model):
+    dice_historic_id = db.Column(db.Integer, primary_key = True)
     value = db.Column(db.Integer)
-    de_id = db.Column(db.Integer, ForeignKey('dice.id'), nullable = False)
-    historiqueLance_id = db.Column(db.Integer, ForeignKey('historique_lance.id'), nullable = False)
+    dice_id = db.Column(db.Integer, ForeignKey('dice.dice_id'), nullable = False)
+    roll_historic_id = db.Column(db.Integer, ForeignKey('roll_historic.roll_historic_id'), nullable = False)
     date_created = db.Column(db.DateTime, default = datetime.utcnow)
     
     def __repr__(self):
-        return '<Historique db de id %r >' % self.id 
+        return '<historice dice nb %r >' % self.dice_historic_id 
 
 
 
 ######################################################################################################################################################
-#                                                           objet pour l'affichage                                                                   #
+#                                                                                                                                                    #
 ######################################################################################################################################################
 
 
 ########################################################################################
 #                                                                                      #
 ########################################################################################
-class historique_affichage():
-    """ objet qui regroupe les informations a afficher """
-    numero_lance = 0
+class historic_to_show():
+    roll_nb = 0
     total_max = 0
     total = 0
     date_created = ''
-    liste_detail = []
+    detail_list = []
 
     def __repr__(self):
-        return '<Historique numéro %r , %r / %r >' % (self.numero_lance , self.total , self.total_max) 
+        return '<Historic number %r , %r / %r >' % (self.roll_nb , self.total , self.total_max) 
 
 ########################################################################################
 #                                                                                      #
 ########################################################################################
-class detail_de():
-    """ objet qui regroupe les informations detaillé d'un dé a afficher"""
-    nom = ''
+class dice_detail():
+    name = ''
     face = 0
     value = 0
     
     def __repr__(self):
-        return '<Historique dé %r , %r / %r >' % (self.nom , self.value , self.face) 
+        return '<Histori dice %r , %r / %r >' % (self.name , self.value , self.face) 
 
 
 ######################################################################################################################################################
-#                                                           fonction                                                                                 #
+#                                                           function                                                                                 #
 ######################################################################################################################################################
 
 ########################################################################################
@@ -145,10 +135,10 @@ class detail_de():
 ########################################################################################
 def testLogin():
     if 'username' in session:
-        utilisateurActif = session['username']
+        user_logged = session['username']
     else:
-        utilisateurActif = "aucun"
-    return utilisateurActif
+        user_logged = "none"
+    return user_logged
 
 
 
@@ -157,7 +147,7 @@ def testLogin():
 ######################################################################################################################################################
 
 ########################################################################################
-#                               racine                                                 #
+#                               root                                                   #
 ########################################################################################
 @app.route('/',methods=['POST','GET'])
 def login():
@@ -165,38 +155,35 @@ def login():
     page2 = "non_active"
     page3 = "non_active"
     page4 = "active"
-    utilisateurActif = testLogin()
-    return render_template('login.html',utilisateurActif = utilisateurActif,page1=page1,page2=page2,page3=page3,page4=page4)  
+    user_logged = testLogin()
+    return render_template('login.html',user_logged = user_logged,page1=page1,page2=page2,page3=page3,page4=page4)  
    
 ########################################################################################
-#                               commande login                                         #
+#                                login                                                 #
 ########################################################################################
 @app.route('/login',methods=['POST','GET'])
 def validerLogin():
     if request.method == 'POST':
         username = request.form['login']
-        password = request.form['mdp']
+        password = request.form['password1']
 
-        print(username)
-        print(password)
-       
-        utilisateurEnBase = user.query.filter_by(login = username).first()
+        user_in_database = user.query.filter_by(login = username).first()
 
-        if utilisateurEnBase:
-            if check_password_hash(utilisateurEnBase.mdp, password):
+        if user_in_database:
+            if check_password_hash(user_in_database.password, password):
                 session['username'] = username
                 return redirect('/pagePrincipale')
             else:
                 flash("mauvais mot de passe")
                 return redirect('/')
         else:
-            flash("utilisateur inconnu")
+            flash("utilisateur inconnu , veuillez créer un nouveau compte")
             return redirect('/')
     else:
         return redirect('/')
 
 ########################################################################################
-#                               commande logout                                        #
+#                                logout                                                #
 ########################################################################################
 @app.route('/logout',methods=['POST','GET'])
 def logout():
@@ -205,7 +192,7 @@ def logout():
   
 
 ########################################################################################
-#                               affichage page nouveau compte                          #
+#                               nouveauCompte page                                     #
 ########################################################################################
 @app.route('/nouveauCompte',methods=['POST','GET'])
 def nouveauCompte():
@@ -213,29 +200,29 @@ def nouveauCompte():
     page2 = "non_active"
     page3 = "non_active"
     page4 = "non_active"
-    utilisateurActif = testLogin()
-    return render_template('nouveauCompte.html',utilisateurActif = utilisateurActif,page1=page1,page2=page2,page3=page3,page4=page4)  
+    user_logged = testLogin()
+    return render_template('nouveauCompte.html',user_logged = user_logged,page1=page1,page2=page2,page3=page3,page4=page4)  
     
 ########################################################################################
-#                               commande valider nouveau compte                        #
+#                               submit new account                                     #
 ########################################################################################
-@app.route('/validerNouveauCompte',methods=['POST','GET'])
-def validerNouveauCompte():
+@app.route('/submitNewAccount',methods=['POST','GET'])
+def submitNewAccount():
     if request.method == 'POST':
 
         login = request.form['login']
-        mdp = request.form['mdp']
-        mdp2 = request.form['mdp2']
+        password = request.form['password']
+        password2 = request.form['password2']
 
-        utilisateurEnBase = user.query.filter_by(login = login).first()
+        user_in_database = user.query.filter_by(login = login).first()
 
-        if utilisateurEnBase:
+        if user_in_database:
             flash("login non disponible")
             return redirect('/nouveauCompte')
         else:
-            if mdp == mdp2:
+            if password == password2:
 
-                new_user = user(login=login,mdp = generate_password_hash(mdp))
+                new_user = user(login=login,password = generate_password_hash(password))
 
                 try:
                     db.session.add(new_user)
@@ -254,7 +241,7 @@ def validerNouveauCompte():
         return redirect('/')
 
 ########################################################################################
-#                               affichage page principale                              #
+#                               page principale                                        #
 ########################################################################################
 @app.route('/pagePrincipale',methods=['POST','GET'])
 def pagePrinc():
@@ -264,18 +251,18 @@ def pagePrinc():
     page4 = "non_active"
     if request.method == 'POST':
 
-        liste_groupe_de = dice_group.query.filter(dice_group.owner == session['username']).all()
-        return render_template('pagePrincipale.html',  liste_groupe_de=liste_groupe_de ,utilisateurActif = session['username'],page1=page1,page2=page2,page3=page3,page4=page4)
+        dice_group_list = dice_group.query.filter(dice_group.owner == session['username']).all()
+        return render_template('pagePrincipale.html',  dice_group_list=dice_group_list ,user_logged = session['username'],page1=page1,page2=page2,page3=page3,page4=page4)
     else:
         if 'username' in session:
 
-            liste_groupe_de = dice_group.query.filter(dice_group.owner == session['username']).all()
-            return render_template('pagePrincipale.html',  liste_groupe_de=liste_groupe_de ,utilisateurActif = session['username'],page1=page1,page2=page2,page3=page3,page4=page4)
+            dice_group_list = dice_group.query.filter(dice_group.owner == session['username']).all()
+            return render_template('pagePrincipale.html',  dice_group_list=dice_group_list ,user_logged = session['username'],page1=page1,page2=page2,page3=page3,page4=page4)
         else:
             return redirect('/')
 
 ########################################################################################
-#                               affichage page création dé                             #
+#                                 "création dé" page                                   #
 ########################################################################################
 @app.route('/creationDe',methods=['POST','GET'])
 def creationDe():
@@ -284,21 +271,21 @@ def creationDe():
     page3 = "non_active"
     page4 = "non_active"
     if request.method == 'POST':
-        listeDe = dice.query.filter(dice.owner == session['username']).all()
-        return render_template('creationDe.html', listeDe=listeDe ,utilisateurActif = session['username'],page1=page1,page2=page2,page3=page3,page4=page4)
+        dice_list = dice.query.filter(dice.owner == session['username']).all()
+        return render_template('creationDe.html', dice_list=dice_list ,user_logged = session['username'],page1=page1,page2=page2,page3=page3,page4=page4)
     else:
 
         if 'username' in session:
-            listeDe = dice.query.filter(dice.owner == session['username']).all()
-            return render_template('creationDe.html', listeDe=listeDe  ,utilisateurActif = session['username'],page1=page1,page2=page2,page3=page3,page4=page4)
+            dice_list = dice.query.filter(dice.owner == session['username']).all()
+            return render_template('creationDe.html', dice_list=dice_list  ,user_logged = session['username'],page1=page1,page2=page2,page3=page3,page4=page4)
         else:
             return redirect('/')
 
 ########################################################################################
-#                               commande valider dé                                    #
+#                               create dice                                            #
 ########################################################################################
-@app.route('/valideDe',methods=['POST','GET'])
-def validerDe():
+@app.route('/createDice',methods=['POST','GET'])
+def createDice():
     if request.method == 'POST':
 
         new_dice = dice(name=request.form['nomDuDe'],value = request.form['nbDeFace'])
@@ -315,12 +302,12 @@ def validerDe():
             return redirect('/')
 
 ########################################################################################
-#                               commande supprimer dé                                  #
+#                               delete dice                                            #
 ########################################################################################
-@app.route('/suprimerDe/<int:id>',methods=['POST','GET'])
-def suprimeDe(id):
+@app.route('/deleteDice/<int:id>',methods=['POST','GET'])
+def deleteDice(id):
     dice_to_delete = dice.query.get_or_404(id)
-    print(id)
+
     try:
         db.session.delete(dice_to_delete)
         db.session.commit()
@@ -331,7 +318,7 @@ def suprimeDe(id):
 
 
 ########################################################################################
-#                               affichage page création de lancé                       #
+#                               "création de lancé" page                               #
 ########################################################################################
 @app.route('/creationLance',methods=['POST','GET'])
 def creationLance():
@@ -340,20 +327,20 @@ def creationLance():
     page3 = "active"
     page4 = "non_active"
     if request.method == 'POST':
-        listeLance = dice_group.query.filter(dice_group.owner == session['username']).all()
-        return render_template('creationLance.html', listeLance=listeLance , utilisateurActif = session['username'],page1=page1,page2=page2,page3=page3,page4=page4) 
+        group_list = dice_group.query.filter(dice_group.owner == session['username']).all()
+        return render_template('creationLance.html', group_list=group_list , user_logged = session['username'],page1=page1,page2=page2,page3=page3,page4=page4) 
     else:
         if 'username' in session:
-            listeLance = dice_group.query.filter(dice_group.owner == session['username']).all()
-            return render_template('creationLance.html', listeLance=listeLance , utilisateurActif = session['username'],page1=page1,page2=page2,page3=page3,page4=page4)
+            group_list = dice_group.query.filter(dice_group.owner == session['username']).all()
+            return render_template('creationLance.html', group_list=group_list , user_logged = session['username'],page1=page1,page2=page2,page3=page3,page4=page4)
         else:
             return redirect('/')
 
 ########################################################################################
-#                               commande valider nouveau lancé                         #
+#                               create dice group                                      #
 ########################################################################################
-@app.route('/validerLance',methods=['POST','GET'])
-def validerLance():
+@app.route('/createGroup',methods=['POST','GET'])
+def createGroup():
     if request.method == 'POST':
 
         new_dice_group = dice_group(name=request.form['nomDuLance'])
@@ -368,16 +355,16 @@ def validerLance():
         return redirect('/')
 
 ########################################################################################
-#                               commande supprimer lancé                               #
+#                               delete dice group                                      #
 ########################################################################################
-@app.route('/suprimerLance/<int:id>',methods=['POST','GET'])
-def suprimeLance(id):
+@app.route('/deleteGroup/<int:id>',methods=['POST','GET'])
+def deleteGroup(id):
     dice_group_to_delete = dice_group.query.get_or_404(id)
-    listeJonction = dice_list_group.query.filter(dice_list_group.idGroup == id).all()
+    junction_list = junction_dice_group.query.filter(junction_dice_group.group_id == id).all()
     try:
         db.session.delete(dice_group_to_delete)
-        for jonction in listeJonction:
-            db.session.delete(jonction)
+        for junction in junction_list:
+            db.session.delete(junction)
         db.session.commit()
         return redirect('/creationLance')
     except:
@@ -385,105 +372,93 @@ def suprimeLance(id):
         return redirect('/creationLance')
 
 ########################################################################################
-#                               affichage page parametrage de lancé                    #
+#                               "parametrage de lancé" page                            #
 ########################################################################################
 @app.route('/parametrerLance/<int:id>',methods=['POST','GET'])
 def parametrerLance(id):
     if request.method == 'POST':
-        groupeSelectionne = dice_group.query.get_or_404(id)
-        session['idGroupeSelectionne'] = id
+        group_selected = dice_group.query.get_or_404(id)
+        session['group_selected_id'] = id
         
-        listeDe = dice.query.filter(dice.owner == session['username']).all()
+        dice_list = dice.query.filter(dice.owner == session['username']).all()
         
-        listeJonction = dice_list_group.query.filter(dice_list_group.idGroup == groupeSelectionne.id).all()
+        junction_list = junction_dice_group.query.filter(junction_dice_group.group_id == group_selected.group_id).all()
         
-        return render_template('parametrageLance.html', listeDe=listeDe , listeJonction=listeJonction , utilisateurActif = session['username'] , groupeSelectionne = groupeSelectionne)
+        return render_template('parametrageLance.html', dice_list=dice_list , junction_list=junction_list , user_logged = session['username'] , group_selected = group_selected)
     else:
         return redirect('/')
 
 ########################################################################################
-#                               commande ajouter un dé au lancé                        #
+#                               add dice to group                                      #
 ########################################################################################
-@app.route('/ajouterAuLance/<int:id>',methods=['POST','GET'])
-def ajouterDe(id):
+@app.route('/addDiceToGroup/<int:id>',methods=['POST','GET'])
+def addDiceToGroup(id):
     if request.method == 'POST':
         dice_to_add = dice.query.get_or_404(id)
-        group_to_add_dice = dice_group.query.get_or_404(session['idGroupeSelectionne'])
+        group_to_add_dice = dice_group.query.get_or_404(session['group_selected_id'])
 
-        new_dice_list_group = dice_list_group( idDice=dice_to_add.id , idGroup=group_to_add_dice.id )
-        db.session.add(new_dice_list_group)
+        new_junction_dice_group = junction_dice_group( dice_id=dice_to_add.dice_id , group_id=group_to_add_dice.group_id )
+        db.session.add(new_junction_dice_group)
     
-        nb_de_de_dans_jonction = dice_list_group.query.filter(dice_list_group.idGroup == group_to_add_dice.id).count()
-        group_to_add_dice.nb_de = nb_de_de_dans_jonction
+        group_to_add_dice.dice_count = junction_dice_group.query.filter(junction_dice_group.group_id == group_to_add_dice.group_id).count()
         db.session.commit()
         
-        print(new_dice_list_group)
-
-        return redirect(url_for('parametrerLance', id=session['idGroupeSelectionne']),code=307)
+    
+        return redirect(url_for('parametrerLance', id=session['group_selected_id']),code=307)
     else:
         return redirect('/')
 
 ########################################################################################
-#                               commande enlever un dé au lancé                        #
+#                               remove dice to group                                   #
 ########################################################################################
-@app.route('/enleverAuLance/<int:id>',methods=['POST','GET'])
-def enleverDe(id):
+@app.route('/removeDiceToGroup/<int:id>',methods=['POST','GET'])
+def removeDiceToGroup(id):
     if request.method == 'POST':
-        # dice_to_remove = dice.query.get_or_404(id)
-        group_to_remove_dice = dice_group.query.get_or_404(session['idGroupeSelectionne'])
+        group_to_remove_dice = dice_group.query.get_or_404(session['group_selected_id'])
 
-        dice_list_group_to_remove = dice_list_group.query.get_or_404(id)
-        db.session.delete(dice_list_group_to_remove)
-
-        nb_de_de_dans_jonction = dice_list_group.query.filter(dice_list_group.idGroup == group_to_remove_dice.id).count()
-        group_to_remove_dice.nb_de = nb_de_de_dans_jonction
+        junction_dice_group_to_remove = junction_dice_group.query.get_or_404(id)
+        db.session.delete(junction_dice_group_to_remove)
+ 
+        group_to_remove_dice.dice_count = junction_dice_group.query.filter(junction_dice_group.group_id == group_to_remove_dice.group_id).count()
         db.session.commit()
         
-        return redirect(url_for('parametrerLance', id=session['idGroupeSelectionne']),code=307)
+        return redirect(url_for('parametrerLance', id=session['group_selected_id']),code=307)
     else:
         return redirect('/')
 
 ########################################################################################
-#                               commande lancer un groupe de dé                        #
+#                               group launch                                           #
 ########################################################################################
-@app.route('/lancerGroupe/<int:id>',methods=['POST','GET'])
-def lancerGroup(id):
+@app.route('/groupLaunch/<int:id>',methods=['POST','GET'])
+def groupLaunch(id):
     if request.method == 'POST':
-        # declaration et initialisation de la variable resultat du lancé
-        resultatLance = 0
-        # recuperation du groupe sur lequel effectuer le lancé
+
+        total_result = 0
         dice_group_to_launch = dice_group.query.get_or_404(id)
-        # list des jonction du groupe selectionné
-        listeJonction = dice_list_group.query.filter(dice_list_group.idGroup == dice_group_to_launch.id).all()
+        junction_list = junction_dice_group.query.filter(junction_dice_group.group_id == dice_group_to_launch.group_id).all()
     
-        new_historique_lance = historique_lance(lance_id = id)
-        db.session.add(new_historique_lance)
+        new_roll_historic = roll_historic(dice_group_id = id)
+        db.session.add(new_roll_historic)
 
+        if len(junction_list) == 0:
+            flash('pas de dé dans ce groupe, veuillez parametrer ce groupe')
+            return redirect('/pagePrincipale')
+        else:    
+            for junction in junction_list:
+                deSelect = dice.query.filter(dice.dice_id == junction.dice_id).first()
+                result = random.randint (1,deSelect.value)
+                dice_result = result
+                total_result += dice_result
+                junction.last_result = dice_result
 
-        for jonction in listeJonction:
-            print (jonction.id)
-            deSelect = dice.query.filter(dice.id == jonction.idDice).first()
-            print (deSelect.name)
-            result = random.randint (1,deSelect.value)
-            dice_result = result
-            resultatLance += dice_result
-            print('resultat individuel ' + str(dice_result))
-            jonction.last_result = dice_result
-
-            new_historique = historique( value = result , historiqueLance_id = new_historique_lance.id , de_id = deSelect.id)
-            db.session.add(new_historique)
-
+                new_dice_historic = dice_historic( value = result , roll_historic_id = new_roll_historic.roll_historic_id , dice_id = deSelect.dice_id)
+                db.session.add(new_dice_historic)
             
-        
-        print('resultat total ' + str(resultatLance))
-        dice_group_to_launch.last_result = resultatLance
+            dice_group_to_launch.last_result = total_result
+            new_roll_historic.valeur_total = total_result
+            db.session.commit()
 
-        new_historique_lance.valeur_total = resultatLance
-        print('id du historiquelance')
-        print(new_historique_lance.id)
-        db.session.commit()
-
-        return redirect('/pagePrincipale')
+            return redirect('/pagePrincipale')
     else:
         return redirect('/')
 
@@ -491,76 +466,77 @@ def lancerGroup(id):
 
 
 ########################################################################################
-#                               affichage page historique du groupe                    #
+#                               "historique du groupe" page                            #
 ########################################################################################
 @app.route('/historique/<int:id>',methods=['POST','GET'])
-def historiqueAff(id):
+def historique(id):
     if request.method == 'POST':
         
-        nom_lance = dice_group.query.filter(dice_group.id == id).first().name
+        selected_dice_group_name = dice_group.query.filter(dice_group.group_id == id).first().name
 
-        # on recupere la liste des historiques liés a ce lancé
-        listeHist = historique_lance.query.filter(historique_lance.lance_id == id).all()
-        # on initialise un liste vide d'historique a afficher
-        liste_hist_aff = []
+        roll_historic_list = roll_historic.query.filter(roll_historic.dice_group_id == id).all()
+        
+        roll_historic_list_to_show = []
        
-        # pour chaque éléments dans la liste d'historique on crée un objet pour l'affichage  
-        for hist in listeHist:
-            hist_aff = historique_affichage()
+        for hist in roll_historic_list:
+            hist_to_show = historic_to_show()
 
-            hist_aff.numero_lance = hist.id
-            hist_aff.total = 0
-            hist_aff.total_max =0
-            hist_aff.liste_detail= []
-            hist_aff.date_created = 'date : '+str(hist.date_created.date())\
-                                    +' heure : '+str(hist.date_created.hour)\
-                                    +':'+str(hist.date_created.minute)\
-                                    +':'+str(hist.date_created.second)
+            hist_to_show.numero_lance = hist.roll_historic_id
+            hist_to_show.total = 0
+            hist_to_show.total_max =0
+            hist_to_show.detail_list= []
+          
+            hist_to_show.date_created = str(hist.date_created.strftime("%H:%M:%S"))+'  '
+            hist_to_show.date_created += str(hist.date_created.strftime("%d/%m/%Y"))
+           
 
-            # liste des historique de dé lié a cet historique lancé
-            liste_hist_de = historique.query.filter(historique.historiqueLance_id == hist.id).all()
-            # pour chaque éléments historique dé on crée un objet detail_de que l'on ajoute a la liste de detail
-            for hist_de in liste_hist_de:
 
-                detail = detail_de()
+            dice_historic_list = dice_historic.query.filter(dice_historic.roll_historic_id == hist.roll_historic_id).all()
+            
+            for dice_hist in dice_historic_list:
 
-                detail.nom = dice.query.filter(dice.id == hist_de.de_id).first().name
-                detail.face = dice.query.filter(dice.id == hist_de.de_id).first().value
-                detail.value = hist_de.value
+                new_dice_detail = dice_detail()
 
-                hist_aff.total += detail.value
-                hist_aff.total_max += detail.face
-                hist_aff.liste_detail.append(detail)
+                new_dice_detail.name = dice.query.filter(dice.dice_id == dice_hist.dice_id).first().name
+                new_dice_detail.face = dice.query.filter(dice.dice_id == dice_hist.dice_id).first().value
+                new_dice_detail.value = dice_hist.value
+
+                hist_to_show.total += new_dice_detail.value
+                hist_to_show.total_max += new_dice_detail.face
+                hist_to_show.detail_list.append(new_dice_detail)
                  
-            liste_hist_aff.append(hist_aff)
+            roll_historic_list_to_show.append(hist_to_show)
   
-        return render_template('historique.html', liste_hist_aff=liste_hist_aff , utilisateurActif = session['username'] ,id=id,nom_lance=nom_lance)
+        return render_template('historique.html', roll_historic_list_to_show=roll_historic_list_to_show , user_logged = session['username'] ,id=id,selected_dice_group_name=selected_dice_group_name)
     else:
         return redirect('/')
       
  
 ########################################################################################
-#                               commande supprimer l'historique d'un groupe de dé      #
+#                               delete historic                                        #
 ########################################################################################
-@app.route('/suprimerHistoriqueDe/<int:id>',methods=['POST','GET'])
-def supprimerHistoriqueDe(id):
+@app.route('/deleteHistoric/<int:id>',methods=['POST','GET'])
+def deleteHistoric(id):
     if request.method == 'POST':
         
-        listHistoriqueLanceToDelete = historique_lance.query.filter(historique_lance.lance_id == id).all()
+        roll_hitoric_to_delete_list = roll_historic.query.filter(roll_historic.dice_group_id == id).all()
 
-        for histLance in listHistoriqueLanceToDelete:
+        for roll_hist_to_delete in roll_hitoric_to_delete_list:
 
-            listeHist = historique.query.filter(historique.historiqueLance_id == histLance.id).all()
+            dice_hist_list = dice_historic.query.filter(dice_historic.roll_historic_id == roll_hist_to_delete.roll_historic_id).all()
 
-            for hist in listeHist:
+            for hist in dice_hist_list:
 
                 db.session.delete(hist)
 
-            db.session.delete(histLance)
+            db.session.delete(roll_hist_to_delete)
     
+        dice_group_to_reset = dice_group.query.get_or_404(id)
+        dice_group_to_reset.last_result = None
+
         db.session.commit()
 
-        return redirect(url_for('historiqueAff', id=id),code=307)
+        return redirect('/pagePrincipale')
     else:
         return redirect('/')
       
