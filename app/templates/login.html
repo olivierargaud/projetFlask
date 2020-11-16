@@ -1,7 +1,6 @@
 {% extends "base.html" %}
 
 {% block content %}
-<section>
 <h3 class="title">Login</h3>
 <div>
 {% with messages = get_flashed_messages() %}
@@ -12,21 +11,14 @@
 {% endif %}
 {% endwith %}
     <form method="POST" action="/login">
-        <div class="email">
+        <div class="login_input">
             <input type="email" name="email" placeholder="Your Email" autofocus="">
         </div>
-        <div class="password">
+        <div class="login_input">
             <input type="password" name="password" placeholder="Your Password">
         </div>
-        <div>
-            <label class="checkbox">
-                <input type="checkbox">
-                Remember me
-            </label>
-        </div>
-        <button>Login</button>
+        <button class="login_button">Login</button>
     </form>
 </div>
-</section>
 
 {% endblock %}

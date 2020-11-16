@@ -1,22 +1,232 @@
-/**app/static/css/style.css**/
-
-@import url('https://fonts.googleapis.com/css?family=Lato&display=swap');
+html{
+    height: 100%;
+}
 
 body {
-    background-color: #3a3a3a;
-    font-family: Lato;
-}
-
-article{
-    width: 50%;
+    background-color: #58FCEA;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
     margin: auto;
-    background-color: rgba(255, 255, 255, 0.5);
-    text-align: center;
-    padding-top: 50px;
-    padding-bottom: 50px;
-    color: white;
+    width: 1280px;
+    height: 100%;
 }
 
-/* h1 {
-    
-}  */
+section{
+    text-align: center;
+    margin: auto;
+    width: 60%;
+    min-height: 500px;
+    background-color: rgba(255, 255, 255, 0.4);
+    padding: 50px;
+    border-radius: 20px;
+}
+
+.nav{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-content: space-around;
+    width: 100%;
+}
+
+.nav a {
+    color: #0040EA;
+    font-size: 2em;
+}
+
+.title{
+    font-size: 2.5em;
+    color: #0040EA;
+}
+
+.login_input input{
+    width: 50%;
+    height: 50px;
+    margin: 10px;
+    border: none;
+    border-radius: 10px;
+    font-size: 2em;
+}
+
+.login_input ::placeholder{
+    text-align: center;
+}
+
+.email_already_exists a{
+    text-decoration: underline;
+}
+
+.sign_up_input input{
+    width: 50%;
+    height: 50px;
+    margin: 10px;
+    border: none;
+    border-radius: 10px;
+    font-size: 2em;
+}
+
+.sign_up_input ::placeholder{
+    text-align: center;
+}
+
+.login_button{
+    width: 50%;
+    height: 50px;
+    margin: 10px;
+    border: none;
+    border-radius: 10px;
+    font-size: 2em;
+    background-color: #0040EA;
+    color : white;
+}
+ .sign_up_button{
+    width: 50%;
+    height: 50px;
+    margin: 10px;
+    border: none;
+    border-radius: 10px;
+    font-size: 2em;
+    background-color: #0040EA;
+    color : white;
+ }
+
+.profile{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center
+}
+
+.create_dice{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+}
+
+.nrb_de_face{
+    width: 130px;
+}
+
+a{
+    text-decoration: none;
+    color: black;
+}
+
+
+a:link:visited:hover:active{
+    text-decoration: none;
+    color: black;
+}
+
+.name_home {
+    color: #0040EA;
+    font-size: 5em;
+    height: 100%;
+}
+
+h2 {
+    text-align: center;
+}
+
+.mes_des{
+    /* border: 1px solid red; */
+    width: 100%;
+}
+
+.create_dice{
+    width: 100%;
+}
+
+.create_dice form{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+}
+
+
+.create_dice form input{
+    width: 33%;
+    height: 30px;
+    margin: 10px;
+    border: none;
+    border-radius: 10px;
+    font-size: 1em;
+}
+
+.create_dice button{
+    width: 23%;
+    height: 33px;
+    margin: 10px;
+    border: none;
+    border-radius: 10px;
+    font-size: 1em;
+    background-color: #0040EA;
+    color : white;
+ }
+
+.create_dice form ::placeholder{
+    text-align: center;
+}
+
+
+
+.dices{
+    width: 100%;
+}
+
+.dices_list{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+
+.dices_list li{
+    list-style: none;
+}
+
+.dices_list ul{
+    padding-left: 0;
+}
+
+.dices_names{
+    font-size: 1.2em;
+    padding-right: 20px;
+    width: 50%;
+    text-align: left;
+}
+
+.dice_button{
+    display: flex;
+    flex-direction: row;
+    width: 30%;
+}
+
+.dice_button form button{
+    height: 33px;
+    margin: 10px;
+    border: none;
+    border-radius: 10px;
+    font-size: 1em;
+    background-color: #0040EA;
+    color : white;
+}
+/* .dice_random_button form button{
+    height: 33px;
+    margin: 10px;
+    border: none;
+    border-radius: 10px;
+    font-size: 1em;
+    background-color: #0040EA;
+    color : white;
+} */
+
+.random_result{
+    background-color: #a3a3a3;
+    color: white;
+    font-size: 1.8em;
+    width: 10%;
+    height: 20%;
+    border-radius: 10px;
+}

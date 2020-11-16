@@ -1,6 +1,8 @@
 from flask_login import UserMixin
 from . import db
 
+## Database table declaration ##
+
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(100), unique=True)
@@ -9,8 +11,8 @@ class User(UserMixin, db.Model):
 
 class Des(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    NbrDeFace = db.Column(db.Integer)
-    Proprietaire = db.Column(db.String(100))
-    NomProprietaire = db.Column(db.String(100))
-    NomDuDes = db.Column(db.String(100))
+    NumberOfFaces = db.Column(db.Integer)
+    Owner = db.Column(db.String(100))
+    OwnerName = db.Column(db.String(100))
+    DiceName = db.Column(db.String(100))
     LastResult = db.Column(db.Integer, nullable=False)

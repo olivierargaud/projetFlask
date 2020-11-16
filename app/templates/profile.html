@@ -1,39 +1,40 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1 class="title">
- Bonjour, {{ name }} !
-</h1>
-<h2>Crée tes dés !</h2>
-<form method="POST" action="/newDice">
-    <div class="nbr_de_face">
-        <input type="number" name="NumberOfFaces" placeholder="Nombre de face" min="1">
-        <input type="text" name="DiceName" placeholder="Nom du dés">
+<div class="profile">
+    <h1 class="title">
+        {{ name }}'s Profile
+       </h1>
+    <div class="create_dice">
+        <h2>Create your dices</h2>
+        <form method="POST" action="/newDice">
+            <input type="number" name="NumberOfFaces" placeholder="Number of faces" min="1" max="10000">
+            <input type="text" name="DiceName" placeholder="Dice name">
+            <button>Create</button>
+        </form>
     </div>
-    <button>Créer</button>
-</form>
-<div>
-    <h2>Mes dés</h2>
-    <div>
-        {% for dice in dice_user: %}
-            <ul>
-                <li>
-                    {{dice.NomDuDes}} : Dés à {{dice.NbrDeFace}} faces 
-                    <div class="delete">
-                        <form method="POST" action="/deleteDice">
-                            <input style="display: none;" type="text" name="getIdDiceToDelete" value={{dice.id}}>
-                            <button>Supprimer</button>
-                        </form>
-                    </div>
-                    <div class="random">
-                        <form method="POST" action="/randomDice">
-                            <input style="display: none;" type="text" name="getNumberForRandom" value={{dice.id}}>
-                            <button>Lancer</button>{{dice.LastResult}}
-                        </form>
-                    </div>
-                </li>
-            </ul>
-        {% endfor %}
+    <div class="dices">
+        <h2>Dices</h2>
+        <div>
+            {% for dice in dice_user: %}
+                <ul>
+                    <li class="dices_list">
+                        <div class="dices_names"><strong>Dice name</strong> : {{dice.DiceName}} <strong>⇨</strong> {{dice.NumberOfFaces}} sided dice</div>
+                        <div class="dice_button">
+                            <form method="POST" action="/deleteDice">
+                                <input style="display: none;" type="text" name="getIdDiceToDelete" value={{dice.id}}>
+                                <button>Delete</button>
+                            </form>
+                            <form method="POST" action="/randomDice">
+                                <input style="display: none;" type="text" name="getNumberForRandom" value={{dice.id}}>
+                                <button>Roll the dice</button>
+                            </form>
+                        </div>
+                        <div class="random_result">{{dice.LastResult}}</div>
+                    </li>
+                </ul>
+            {% endfor %}
+        </div>
     </div>
 </div>
 {% endblock %}
