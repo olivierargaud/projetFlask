@@ -5,6 +5,8 @@ from sqlalchemy.orm import relationship
 from datetime import datetime
 from werkzeug.security import check_password_hash, generate_password_hash
 import random
+import click
+from flask.cli import with_appcontext
 
 
 app = Flask(__name__)
@@ -541,3 +543,8 @@ def deleteHistoric(id):
         return redirect('/')
       
          
+
+@app.cli.command("initbase")
+@with_appcontext
+def create_user():
+    db.create_all()

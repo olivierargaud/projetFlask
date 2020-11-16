@@ -1,4 +1,12 @@
 
+je n'avais pas compris qu'il fallait que le python créé la base
+ducoup j'ai juste rajouté la commande initbase au dernier moment pour créer une base vide
+par contre je n'ai pas trouvé comment la générer depuis un .sql
+
+sinon je laisse ma base dans un rep maBase pour test 
+
+
+
 compte deja créé en base 
 	login : olivier
 	password : 123456789
