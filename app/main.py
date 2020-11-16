@@ -3,11 +3,12 @@ from random import randrange
 from flask_login import login_required, current_user
 from .models import Des
 from . import db
+import os
 
 main = Blueprint('main', __name__)
 
 ## Index route, means that is the first page you get when you access to the website ##
-@main.route('/')
+@main.route('/', methods=['GET', 'POST'])
 def index():
     return render_template('index.html')
 
