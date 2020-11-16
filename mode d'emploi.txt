@@ -1,0 +1,16 @@
+
+compte deja créé en base 
+	login : olivier
+	password : 123456789
+
+pour créer un nouveau compte cliquer sur nouveau compte en bas de page
+
+navigation depuis la barre menu en haut de l'ecran
+
+une fois loggé il faut commencer par creer ses dés dans création dé
+
+puis créer des groupes de dés dans création lancé et les parametrer(choisir quels dés ont souhaite inclure)
+
+après ca sur la page principale on peut effectuer des lancé de chaque groupe créé
+
+regarder l'historique de chaque groupe et eventuelement l'effacer
